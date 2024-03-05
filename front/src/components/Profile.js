@@ -1,42 +1,75 @@
-import { useLocation } from "react-router-dom";
-import auth from "../config/firebase";
-import axios from 'axios';
+import React from "react";
+import { Button, Grid, Typography, Paper, Avatar } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import {useAuth} from "../contexts/AuthContext";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import MapIcon from '@mui/icons-material/Map';
 
 export default function Profile() {
-  const location = useLocation();
-  const email = location.state;
+  const navigate = useNavigate();  
+  const { logout, setError, currentUser } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
-      localStorage.removeItem('@token');
-  
-      if (email) {
-        const response = await axios.get(
-          'http://localhost:4000/logout?email=' + email,
-        ); 
-        // Check if response status is 200 OK
-        if (response.status === 200) {
-          // Redirect to home page after successful logout
-          window.location.href = '/';
+        setError("");
+        const logoutSuccess = await logout();
+        if (logoutSuccess && !currentUser) {
+            navigate("/"); 
         } else {
-          // Handle non-200 status code
-          console.error('Logout failed. Status:', response.status);
+            setError("Failed to logout");
         }
-      } else {
-        window.location.href = '/';
-      }
-    } catch (error) {
-      console.error('Error logging out:', error.message);
+    } catch {
+        setError("Failed to logout");
     }
   };
-  
+
+  const navigateToMap = () => {
+    navigate("/profile/map");
+  };
 
   return (
-    <div>
-      <h1>Profile</h1>
-      <p>Data received: Welcome {email ? email : 'Guest'}</p>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={2}
+      style={{ height: "100vh" }}
+    >
+      <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px', backgroundColor: 'rgba(255, 255, 255, 0.5)', backdropFilter: 'blur(10px)' }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          Profile
+        </Typography>
+        <Avatar style={{ margin: '0 auto', backgroundColor: '#3f51b5' }}>
+          <AccountCircleIcon />
+        </Avatar>
+        <Typography variant="h6" align="center" gutterBottom>
+          Welcome {currentUser.email}
+        </Typography>
+        <Button
+          startIcon={<MapIcon />}
+          onClick={navigateToMap}
+          variant="contained"
+          color="primary"
+          className="map-button"
+          size="large"
+          fullWidth
+        >
+          Go To Parking Map
+        </Button>
+        <Button
+          startIcon={<ExitToAppIcon />}
+          onClick={handleLogout}
+          variant="contained"
+          color="primary"
+          className="logout-button"
+          size="large"
+          fullWidth
+        >
+          Logout
+        </Button>
+      </Paper>
+    </Grid>
   );
 }

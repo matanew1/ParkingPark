@@ -13,7 +13,7 @@ const Logout = () => {
             setError("");
             const logoutSuccess = await logout();
             if (logoutSuccess && !currentUser) {
-                navigate("/"); 
+                navigate("/login"); 
             } else {
                 setError("Failed to logout");
             }
