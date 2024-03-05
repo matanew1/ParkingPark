@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { auth } from "./firebase";
+import auth from "../config/firebase";
 import axios from 'axios';
 
 export default function Profile() {
