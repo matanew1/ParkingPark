@@ -28,18 +28,15 @@ const Login = () => {
     try {
       setError("");
       setLoading(true);
-      const loginSuccess = await login(email, password);
-      if (loginSuccess) {
-        navigate("/profile"); // navigate to /profile only when login is successful
-      } 
-      else {
-        setError("Failed to login");
-      }
+      if (success) await login(email, password);
+      else setError("Failed to login: " + e.message);
+      navigate("/profile"); // navigate to /profile only when login is successful
     } catch (e) {
-      setError("Failed to login");
+      setError("Failed to login: " + e.message);
+    } finally {
+      setLoading(false);
     }
 
-    setLoading(false);
   }
 
   return (

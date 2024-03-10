@@ -3,7 +3,7 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 
 export default function ErrorMessage() {
-    const { error, setError } = useAuth();
+    const { error } = useAuth();
 
     return (
         error && (
