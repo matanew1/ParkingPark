@@ -37,10 +37,10 @@ const Register = () => {
             if (registerSuccess) {
                 navigate("/profile"); // navigate to /profile only when registration is successful
             } else {
-                setError("Failed to register" + e.message);
+                setError("Failed to register user");
             }
         } catch (e) {
-            setError("Failed to register: " + e.message);
+            setError("Failed to register user");
         }
 
         setLoading(false);

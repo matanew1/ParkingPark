@@ -28,11 +28,12 @@ const Login = () => {
     try {
       setError("");
       setLoading(true);
+      let success = false;
       if (success) await login(email, password);
-      else setError("Failed to login: " + e.message);
+      else setError("Failed to login: Invalid email or password");
       navigate("/profile"); // navigate to /profile only when login is successful
     } catch (e) {
-      setError("Failed to login: " + e.message);
+      setError("Failed to login: Invalid email or password");
     } finally {
       setLoading(false);
     }
