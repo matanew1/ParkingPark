@@ -26,11 +26,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      setError("");
       setLoading(true);
-      let success = false;
-      if (success) await login(email, password);
-      else setError("Failed to login: Invalid email or password");
+      await login(email, password);
       navigate("/profile"); // navigate to /profile only when login is successful
     } catch (e) {
       setError("Failed to login: Invalid email or password");

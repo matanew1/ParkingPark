@@ -1,11 +1,4 @@
-const admin = require("firebase-admin");
-const serviceAccount = require("./secret.json");
-
-// Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
+const admin = require("./admin");
 
 const verifyToken = async (req, res, next) => {
   try {

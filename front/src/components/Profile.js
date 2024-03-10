@@ -12,12 +12,9 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-        setError("");
         const logoutSuccess = await logout();
         if (logoutSuccess && !currentUser) {
             navigate("/"); 
-        } else {
-            setError("Failed to logout");
         }
     } catch {
         setError("Failed to logout");
