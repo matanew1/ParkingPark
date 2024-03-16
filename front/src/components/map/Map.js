@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Box, Grid, Typography, AppBar, Toolbar, IconButton, Button } from '@mui/material';
+import { Hidden, Box, Grid, Typography, AppBar, Toolbar, IconButton, Button } from '@mui/material';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
+import AddReactionIcon from '@mui/icons-material/AddReaction';
+import MapIcon from '@mui/icons-material/Map';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { renderToString } from 'react-dom/server';
@@ -47,14 +49,38 @@ const Map = () => {
 
     return (
         <>
-            <AppBar position="static">
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" aria-label="back" onClick={() => navigate('/profile/'+currentUser.reloadUserInfo.localId)}>
-                        <ArrowBackIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        Map
-                    </Typography>
+            <AppBar position="absolute" sx={{ 
+                backdropFilter: "blur(5px)", 
+                backgroundColor: "transparent", 
+                width: "40%", // Set the width to 80% of the parent container
+                marginLeft: "30%",
+                marginRight: "30%" // Center the AppBar by setting the left margin to 10%
+            }}>
+                <Toolbar sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    color: 'black',
+                    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.9)',
+                    borderRadius: "10px", // Add rounded borders
+
+                }}>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap', 
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        gap: 8
+                    }}>
+                        <IconButton color="black" aria-label="back" onClick={() => navigate('/profile/'+currentUser.reloadUserInfo.localId)} >
+                            <ArrowBackIcon /> &nbsp;Back to profile
+                        </IconButton>
+                        <Hidden lgDown>
+                            <IconButton color="black" aria-label="map">
+                                <MapIcon /> &nbsp;Map Parking
+                            </IconButton>
+                        </Hidden>
+                    </Box>
                 </Toolbar>
             </AppBar>
             <Grid container>
@@ -63,9 +89,9 @@ const Map = () => {
                         id="map"
                         sx={{
                             width: "100vw", // Full viewport width
-                            height: "calc(100vh - 64px)", // Full viewport height minus AppBar height
+                            height: "100vh", // Full viewport height
                             position: "absolute", // Make the map position absolute
-                            top: 64, // Align the map below the AppBar
+                            top: 0, // Align the map to the top
                             left: 0, // Align the map to the left
                         }}
                     />

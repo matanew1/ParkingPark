@@ -27,7 +27,6 @@ export function LocationProvider({ children }) {
                 setParkings(response.data);
             } catch (error) {
                 setError(error);
-                fetchData();
             }
         };
 

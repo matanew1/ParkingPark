@@ -10,21 +10,21 @@
     fill: green;
     stroke: black;
     stroke-width: 1px;
-    filter: drop-shadow(0 0 5px green);
+    filter: drop-shadow(0 0 2px green);
 }
 
 .my-icon-secondary svg {
     fill: orange;
     stroke: black;
     stroke-width: 1px;
-    filter: drop-shadow(0 0 5px orange);
+    filter: drop-shadow(0 0 2px orange);
 }
 
 .my-icon-disabled svg {
     fill: red;
     stroke: black;
     stroke-width: 1px;
-    filter: drop-shadow(0 0 5px red);
+    filter: drop-shadow(0 0 2px red);
 }
 
 .my-icon-closed svg {
