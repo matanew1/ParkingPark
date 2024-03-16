@@ -29,7 +29,7 @@ export function LocationProvider({ children }) {
                 setError(error);
             }
         })();
-    }, []);
+    }, [parkings]);
 
     useEffect(() => {
         let watchId;
@@ -57,7 +57,7 @@ export function LocationProvider({ children }) {
                 navigator.geolocation.clearWatch(watchId);
             }
         };
-    }, []);
+    }, [ setLocation, setError ]);
 
     const value = {
         location,
