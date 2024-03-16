@@ -29,12 +29,12 @@ export default function App() {
             {/*  BASIC ROUTES AUTH  */}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<WithPrivateRoute><Profile /></WithPrivateRoute>} />
+            <Route path="/profile/:userId" element={<WithPrivateRoute><Profile /></WithPrivateRoute>} />
             <Route path="/" element={<Navigate to="/login" />} />
 
             {/*  MAP ROUTES  */}
             
-            <Route path="/profile/map" element={<LocationProvider><Map /></LocationProvider>} />
+            <Route path="/profile/:userId/map" element={<LocationProvider><Map /></LocationProvider>} />
             
           </Routes>
         </Router>

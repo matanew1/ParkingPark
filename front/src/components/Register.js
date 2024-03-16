@@ -19,7 +19,7 @@ const Register = () => {
 
     useEffect(() => {
         if (currentUser) {
-            navigate("/");
+            navigate("/profile/"+currentUser.reloadUserInfo.localId); 
         }
     }, [currentUser, navigate]);
 
@@ -33,12 +33,7 @@ const Register = () => {
         try {
             setError("");
             setLoading(true);
-            const registerSuccess = await register(email, password);
-            if (registerSuccess) {
-                navigate("/profile"); // navigate to /profile only when registration is successful
-            } else {
-                setError("Failed to register user");
-            }
+            await register(email, password);
         } catch (e) {
             setError("Failed to register user");
         }

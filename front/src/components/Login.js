@@ -18,7 +18,7 @@ const Login = () => {
 
   useEffect(() => {
     if (currentUser) {
-      navigate("/profile");
+      navigate("/profile/"+currentUser.reloadUserInfo.localId);
     }
   }, [currentUser, navigate]);
 
@@ -28,7 +28,6 @@ const Login = () => {
     try {
       setLoading(true);
       await login(email, password);
-      navigate("/profile"); // navigate to /profile only when login is successful
     } catch (e) {
       setError("Failed to login: Invalid email or password");
     } finally {

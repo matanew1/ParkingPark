@@ -18,18 +18,28 @@ export function LocationProvider({ children }) {
     const [parkings, setParkings] = useState([]);
 
     useEffect(() => {
-        (async () => {
+        const fetchData = async () => {
             try {
                 const response = await axios.get(`http://localhost:4000/api/parking/stations`, {
                     headers: {'Content-Type': 'application/json'}
                 });
-                console.log(parkings);
+                console.log(response.data);
                 setParkings(response.data);
             } catch (error) {
                 setError(error);
+                fetchData();
             }
-        })();
-    }, [parkings]);
+        };
+
+        // Call once immediately
+        fetchData();
+
+        // Then call every 30 seconds
+        const interval = setInterval(fetchData, 30000); // 30 seconds
+
+        // Clear interval on component unmount
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         let watchId;
@@ -57,7 +67,7 @@ export function LocationProvider({ children }) {
                 navigator.geolocation.clearWatch(watchId);
             }
         };
-    }, [ setLocation, setError ]);
+    }, []); // Removed setLocation and setError from the dependency array
 
     const value = {
         location,

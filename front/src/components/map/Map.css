@@ -9,19 +9,22 @@
 .my-icon-primary svg {
     fill: green;
     stroke: black;
-    stroke-width: 2px;
+    stroke-width: 1px;
+    filter: drop-shadow(0 0 5px green);
 }
 
 .my-icon-secondary svg {
     fill: orange;
     stroke: black;
-    stroke-width: 2px;
+    stroke-width: 1px;
+    filter: drop-shadow(0 0 5px orange);
 }
 
 .my-icon-disabled svg {
     fill: red;
     stroke: black;
-    stroke-width: 2px;
+    stroke-width: 1px;
+    filter: drop-shadow(0 0 5px red);
 }
 
 @keyframes flash {

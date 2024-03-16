@@ -11,19 +11,20 @@ import { useLocation } from '../../contexts/LocationContext';
 const Map = () => {
     const mapRef = useRef(null);
     const markerRef = useRef(null);
-    const {location, parkings } = useLocation();
+    const { location, parkings } = useLocation();
 
     useEffect(() => {
         if (location) {
             const { latitude, longitude } = location;
-
             if (!mapRef.current) {
                 initializeMap(mapRef, latitude, longitude);
+            } else {
+                updateMapCenter(mapRef, latitude, longitude);
             }
-
-            createMarkersParking(parkings, mapRef);
             updateMarker(markerRef, mapRef, latitude, longitude);
         }
+        if (parkings) createMarkersParking(parkings, mapRef);
+        
     }, [location, parkings]);
 
     return (
@@ -53,10 +54,11 @@ const initializeMap = (mapRef, latitude, longitude) => {
     mapRef.current = L.map("map", mapOptions);
 
     const layer = L.tileLayer(
-        "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", // Use HTTPS instead of HTTP
+        {attribution: '© OpenStreetMap',  maxZoom: 18}
     );
 
-    mapRef.current.addLayer(layer);
+    layer.addTo(mapRef.current);
 }
 
 const createMarkersParking = (parkings, mapRef) => {
@@ -75,7 +77,7 @@ const createMarkersParking = (parkings, mapRef) => {
         const customIcon = L.divIcon({
             className: 'my-icon',
             html: iconHtml,
-            iconSize: [20, 20],
+            iconSize: [30, 30],
         });
     
         const marker = L.marker([parking.GPSLattitude, parking.GPSLongitude], { icon: customIcon }).addTo(mapRef.current);
@@ -112,6 +114,10 @@ const updateMarker = (markerRef, mapRef, latitude, longitude) => {
     markerRef.current.on('click', () => {
         markerRef.current.bindPopup(`<b>Location:</b> ${latitude}, ${longitude}`).openPopup();
     });
+}
+
+const updateMapCenter = (mapRef, latitude, longitude) => {
+    mapRef.current.setView([latitude, longitude], mapRef.current.getZoom());
 }
 
 export default Map;

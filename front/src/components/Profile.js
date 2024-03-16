@@ -22,7 +22,7 @@ export default function Profile() {
   };
 
   const navigateToMap = () => {
-    navigate("/profile/map");
+    navigate(`/profile/${currentUser.reloadUserInfo.localId}/map`);
   };
 
   return (
