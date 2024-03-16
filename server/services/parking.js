@@ -35,16 +35,17 @@ class ParkingService {
         try {
             const response = await this.#axios.get('/stations');
             if (response.status >= 200 && response.status < 300) {
-                this.#stations = response.data.map(station => {
-                    // Ensure all properties are present and correctly named
-                    const {AhuzotCode, Name, Address, GPSLatitude, GPSLongitude, DaytimeFee, FeeComments } = station;
-                    // Verify the data type of each property
-                    return new Station(AhuzotCode, Name, Address, GPSLatitude, GPSLongitude, DaytimeFee, FeeComments);          
-                });
+                this.#stations = response.data.reduce((stations, station) => {
+                    const { AhuzotCode, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments } = station;
+                    if (AhuzotCode && Name && Address && GPSLattitude && GPSLongitude && DaytimeFee && FeeComments) {
+                        stations.push(new Station(AhuzotCode, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments));
+                    }
+                    return stations;
+                }, []);
                 await this.#updateStationsStatus(this.#stations);
                 return this.#stations;
             } else {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw response.error;
             }
         } catch (error) {
             console.error('Error', error.message);

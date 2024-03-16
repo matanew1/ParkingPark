@@ -1,10 +1,10 @@
 class Station {
-    constructor(Code, Name, Address, GPSLatitude, GPSLongitude, DaytimeFee, FeeComments) {
+    constructor(Code, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments) {
         // Assign properties to the instance
         this.Code = Code;
         this.Name = Name;
         this.Address = Address;
-        this.GPSLatitude = GPSLatitude;
+        this.GPSLattitude = GPSLattitude;
         this.GPSLongitude = GPSLongitude;
         this.DaytimeFee = DaytimeFee;
         this.FeeComments = FeeComments;

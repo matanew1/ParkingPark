@@ -1,5 +1,6 @@
 // LocationContext.js
 import { createContext, useContext, useEffect, useState } from "react";
+import axios from 'axios';
 
 const LocationContext = createContext();
 
@@ -14,6 +15,21 @@ export function useLocation() {
 export function LocationProvider({ children }) {
     const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);
+    const [parkings, setParkings] = useState([]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/api/parking/stations`, {
+                    headers: {'Content-Type': 'application/json'}
+                });
+                console.log(parkings);
+                setParkings(response.data);
+            } catch (error) {
+                setError(error);
+            }
+        })();
+    }, []);
 
     useEffect(() => {
         let watchId;
@@ -47,7 +63,8 @@ export function LocationProvider({ children }) {
         location,
         error,
         setLocation,
-        setError
+        setError,
+        parkings,
     };
 
     return (
