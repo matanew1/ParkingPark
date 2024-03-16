@@ -1,9 +1,14 @@
-const User = require('../models/user');
 const admin = require("../firebase/admin");
 
 class UserService {
+    #admin; // private field
+
+    constructor() {
+        this.#admin = admin;
+    }
+
     getAllUsers() {
-        return admin.auth().listUsers()
+        return this.#admin.auth().listUsers()
             .then((userRecords) => {
                 return userRecords.users.map(user => user.toJSON());
             })
@@ -13,7 +18,5 @@ class UserService {
             });
     }
 }
-
-module.exports = UserService;
 
 module.exports = UserService;

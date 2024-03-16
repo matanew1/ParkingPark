@@ -1,25 +1,31 @@
 const mongoose = require("mongoose");
+require('dotenv').config();
 
-// Connect to MongoDB
-async function connectToMongoDB(mongoURI) {
-  try {
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
+class Database {
+  #mongoose;
+  #mongoURI;
+
+  constructor() {
+    this.#mongoose = mongoose;
+    this.#mongoose.set("strictPopulate", false);
+    this.#mongoURI = process.env.MONGO_URI;
+  }
+
+  async connectToMongoDB() {
+    try {
+      await this.#mongoose.connect(this.#mongoURI);
+      console.log("Connected to MongoDB");
+    } catch (error) {
+      console.error("Failed to connect to MongoDB", error);
+    }
+  }
+
+  get mongoose() {
+    return this.#mongoose;
   }
 }
 
-// Retrieve the MongoDB connection URI from the configuration
-const mongoURI = "mongodb+srv://matan:matan@cluster0.bgo3pus.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const db = new Database();
+db.connectToMongoDB();
 
-// Establish the connection to MongoDB
-connectToMongoDB(mongoURI);
-
-// Set the strictPopulate option globally for Mongoose
-mongoose.set("strictPopulate", false);
-
-module.exports = mongoose;
+module.exports = db;

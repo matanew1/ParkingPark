@@ -1,21 +1,33 @@
 const db = require("./database.js");
 
-// Define a schema for the user model
-const userSchema = new db.mongoose.Schema({
-  email: {
-    type: String,
-    required: true
-  },
-  isLoggedIn: {
-    type: Boolean,
-    required: true
-  },
-  lastLogin: {
-    type: Date
+class UserModel {
+  #User;
+
+  constructor() {
+    this.#User = this.#defineSchema();
   }
-});
 
-// Define a model for the user collection
-const User = db.mongoose.model("User", userSchema);
+  #defineSchema() {
+    const userSchema = new db.mongoose.Schema({
+      email: {
+        type: String,
+        required: true
+      },
+      isLoggedIn: {
+        type: Boolean,
+        required: true
+      },
+      lastLogin: {
+        type: Date
+      }
+    });
 
-module.exports = User;
+    return db.mongoose.model("User", userSchema);
+  }
+
+  getModel() {
+    return this.#User;
+  }
+}
+
+module.exports = new UserModel().getModel();
