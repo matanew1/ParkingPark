@@ -27,6 +27,12 @@
     filter: drop-shadow(0 0 5px red);
 }
 
+.my-icon-closed svg {
+    fill: black;
+    stroke: rgb(60, 31, 31);
+    stroke-width: 1px;
+}
+
 @keyframes flash {
     0% { fill-opacity: 1; }
     25% { fill-opacity: .5; }

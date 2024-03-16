@@ -1,26 +1,44 @@
 import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography, AppBar, Toolbar, IconButton, Button } from '@mui/material';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { renderToString } from 'react-dom/server';
 import "./Map.css"; // Import the CSS file
 import { useLocation } from '../../contexts/LocationContext';
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from 'react-router-dom';
+
+
+const PARKING_STATUS = {
+    AVAILABLE: 'פנוי',
+    FEW: 'מעט',
+    FULL: 'מלא',
+    CLOSED: 'סגור'
+};
+
+const ICON_CLASSES = {
+    PRIMARY: 'my-icon-primary',
+    SECONDARY: 'my-icon-secondary',
+    DISABLED: 'my-icon-disabled',
+    CLOSED: 'my-icon-closed',
+};
 
 const Map = () => {
     const mapRef = useRef(null);
     const markerRef = useRef(null);
     const { location, parkings } = useLocation();
+    const { currentUser } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (location) {
             const { latitude, longitude } = location;
             if (!mapRef.current) {
                 initializeMap(mapRef, latitude, longitude);
-            } else {
-                updateMapCenter(mapRef, latitude, longitude);
-            }
+            } 
             updateMarker(markerRef, mapRef, latitude, longitude);
         }
         if (parkings) createMarkersParking(parkings, mapRef);
@@ -28,22 +46,35 @@ const Map = () => {
     }, [location, parkings]);
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
-                <Box
-                    id="map"
-                    sx={{
-                        width: "100vw", // Full viewport width
-                        height: "100vh", // Full viewport height
-                        position: "absolute", // Make the map position absolute
-                        top: 0, // Align the map to the top
-                        left: 0, // Align the map to the left
-                    }}
-                />
+        <>
+            <AppBar position="static">
+                <Toolbar>
+                    <IconButton edge="start" color="inherit" aria-label="back" onClick={() => navigate('/profile/'+currentUser.reloadUserInfo.localId)}>
+                        <ArrowBackIcon />
+                    </IconButton>
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        Map
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Grid container>
+                <Grid item xs={12}>
+                    <Box
+                        id="map"
+                        sx={{
+                            width: "100vw", // Full viewport width
+                            height: "calc(100vh - 64px)", // Full viewport height minus AppBar height
+                            position: "absolute", // Make the map position absolute
+                            top: 64, // Align the map below the AppBar
+                            left: 0, // Align the map to the left
+                        }}
+                    />
+                </Grid>
             </Grid>
-        </Grid>
+        </>
     );
 };
+
 
 const initializeMap = (mapRef, latitude, longitude) => {
     const mapOptions = {
@@ -64,12 +95,14 @@ const initializeMap = (mapRef, latitude, longitude) => {
 const createMarkersParking = (parkings, mapRef) => {
     parkings.forEach(parking => {
         let iconClass;
-        if (parking.Status === 'פנוי') {
-            iconClass = 'my-icon-primary';
-        } else if (parking.Status === 'מעט') {
-            iconClass = 'my-icon-secondary';
-        } else {
-            iconClass = 'my-icon-disabled';
+        if (parking.Status === PARKING_STATUS.AVAILABLE) {
+            iconClass = ICON_CLASSES.PRIMARY;
+        } else if (parking.Status === PARKING_STATUS.FEW) {
+            iconClass = ICON_CLASSES.SECONDARY;
+        } else if (parking.Status === PARKING_STATUS.FULL){
+            iconClass = ICON_CLASSES.DISABLED;
+        } else if (parking.Status === PARKING_STATUS.CLOSED){
+            iconClass = ICON_CLASSES.CLOSED;
         }
 
         const iconHtml = renderToString(<div className={iconClass}><LocationOnIcon color="primary" /></div>);
@@ -116,8 +149,5 @@ const updateMarker = (markerRef, mapRef, latitude, longitude) => {
     });
 }
 
-const updateMapCenter = (mapRef, latitude, longitude) => {
-    mapRef.current.setView([latitude, longitude], mapRef.current.getZoom());
-}
 
 export default Map;
