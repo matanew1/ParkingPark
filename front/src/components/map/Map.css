@@ -1,0 +1,31 @@
+:root {
+    --flash-duration: 1.3s;
+    --flash-timing-function: linear;
+    --flash-iteration-count: infinite;
+    --shine-color: limegreen; /* Change this to your desired green color */
+    --glow-color: lime; /* Change this to your desired glow color */
+}
+
+@keyframes flash {
+    0% { fill-opacity: 1; }
+    25% { fill-opacity: .5; }
+    50% { fill-opacity: 0; }
+    75% { fill-opacity: .5; }
+    100% { fill-opacity: 1; }
+}
+
+@keyframes shine {
+    0% { fill: var(--shine-color); }
+    50% { fill: transparent; }
+    100% { fill: var(--shine-color); }
+}
+
+.flashing-icon svg {
+    animation: 
+        flash var(--flash-duration) var(--flash-timing-function) var(--flash-iteration-count),
+        shine var(--flash-duration) var(--flash-timing-function) var(--flash-iteration-count);
+    font-weight: bold; /* Make the icon bolder */
+    stroke: black; /* Set the color of the border */
+    stroke-width: 1; /* Set the width of the border */
+    text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px var(--glow-color), 0 0 40px var(--glow-color); /* Add a glow effect */
+}

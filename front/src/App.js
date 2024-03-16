@@ -8,6 +8,8 @@ import Register from "./components/Register";
 import Profile from "./components/Profile";
 import ErrorMessage from "./components/error/ErrorMessage";
 import WithPrivateRoute from "./components/auth/WithPrivateRoute";
+import Map from "./components/map/Map";
+import {LocationProvider} from "./contexts/LocationContext";
 
 const theme = createTheme();
 
@@ -24,10 +26,16 @@ export default function App() {
         <Router>
           <ErrorMessage />
           <Routes>
+            {/*  BASIC ROUTES AUTH  */}
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<WithPrivateRoute><Profile /></WithPrivateRoute>} />
             <Route path="/" element={<Navigate to="/login" />} />
+
+            {/*  MAP ROUTES  */}
+            
+            <Route path="/profile/map" element={<LocationProvider><Map /></LocationProvider>} />
+            
           </Routes>
         </Router>
       </AuthProvider>
