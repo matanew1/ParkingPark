@@ -1,0 +1,12 @@
+# Ignore files and directories
+.git
+node_modules
+*.log
+
+# Ignore specific file types
+*.txt
+*.docx
+
+# Ignore directories
+logs/
+temp/
