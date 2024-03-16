@@ -7,15 +7,14 @@ class UserService {
         this.#admin = admin;
     }
 
-    getAllUsers() {
-        return this.#admin.auth().listUsers()
-            .then((userRecords) => {
-                return userRecords.users.map(user => user.toJSON());
-            })
-            .catch((error) => {
-                console.error('Error listing users:', error);
-                throw error;
-            });
+    getAllUsers = async () => {
+        try {
+            const userRecords = await this.#admin.auth().listUsers();
+            return userRecords.users.map(user => user.toJSON());
+        } catch (error) {
+            console.error('Error listing users:', error);
+            throw error;
+        }
     }
 }
 

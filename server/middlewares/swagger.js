@@ -3,17 +3,30 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const options = {
-    swaggerDefinition: {
+    definition: {
+        openapi: '3.0.0',
         info: {
             title: "ParkingPark API",
+            version: "1.0.0", // version of the API
             description: "ParkingPark API Information",
             contact: {
                 name: "Developer",
+                email: "matanew1@bardugo.com", // your email
             },
-            servers: ["http://localhost:4000"],
+            license: {
+                name: "MIT License",
+                url: "https://spdx.org/licenses/MIT.html",
+            },
         },
+        servers: [
+            {
+                url: "http://localhost:4000",
+                description: "Local server",
+            },
+            // add other servers if any
+        ],
     },
-    apis: ["./routes/user.js"],
+    apis: ["./routes/*.js"], // files containing annotations as above
 };
 
 const specs = swaggerJsDoc(options);
