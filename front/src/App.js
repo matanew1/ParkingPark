@@ -32,8 +32,7 @@ export default function App() {
             <Route path="/profile/:userId" element={<WithPrivateRoute><Profile /></WithPrivateRoute>} />
             <Route path="/" element={<Navigate to="/login" />} />
 
-            {/*  MAP ROUTES  */}
-            
+            {/*  MAP ROUTES  */}           
             <Route path="/profile/:userId/map" element={<LocationProvider><Map /></LocationProvider>} />
             
           </Routes>

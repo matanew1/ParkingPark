@@ -43,8 +43,9 @@ const Map = () => {
             } 
             updateMarker(markerRef, mapRef, latitude, longitude);
         }
-        if (parkings) createMarkersParking(parkings, mapRef);
-        
+        if (parkings && mapRef.current) { // Add null check here
+            createMarkersParking(parkings, mapRef);
+        }
     }, [location, parkings]);
 
     return (

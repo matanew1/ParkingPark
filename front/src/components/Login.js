@@ -18,6 +18,7 @@ const Login = () => {
 
   useEffect(() => {
     if (currentUser) {
+      console.log(currentUser);
       navigate("/profile/"+currentUser.reloadUserInfo.localId);
     }
   }, [currentUser, navigate]);
