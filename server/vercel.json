@@ -6,6 +6,10 @@
             "use": "@vercel/node"
         }
     ],
+    "env" : {
+        "MONGO_URI": "mongodb+srv://matan:matan@cluster0.bgo3pus.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+        "BASE_URL": "https://api.tel-aviv.gov.il/parking"
+    },
     "routes": [
         {
             "src": "/routes/.*",
