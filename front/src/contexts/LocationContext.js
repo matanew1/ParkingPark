@@ -37,7 +37,6 @@ export function LocationProvider({ children }) {
 
     // Call once immediately
     fetchData();
-
     // Then call every intervalTime milliseconds
     const interval = setInterval(fetchData, intervalTime);
 
