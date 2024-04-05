@@ -20,11 +20,7 @@
         "api/*": {
             "runtime": "nodejs12.x",
             "memory": 512,
-            "includeFiles": "api/**",
-            "environment": {
-                "MONGO_URI": "mongodb+srv://matan:matan@cluster0.bgo3pus.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-                "BASE_URL": "https://api.tel-aviv.gov.il/parking"
-            }
+            "includeFiles": "api/**"
         }
     },
     "regions": ["sfo", "nyc"]
