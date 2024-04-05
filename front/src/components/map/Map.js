@@ -16,14 +16,8 @@ import {
   AppBar,
   Toolbar,
   Fab,
-  Paper,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
+  Paper
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import IconButton from "@mui/material/IconButton";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -53,11 +47,7 @@ const Map = () => {
   const [line, setLine] = useState(null);
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    
   // useMemo is used to memoize the map options - this is useful when the map options are not changing
   const mapOptions = useMemo(
     () => ({
@@ -147,43 +137,7 @@ const Map = () => {
             borderRadius: "10px",
           }}
         >
-          <Hidden smUp>
-            <IconButton
-              onClick={handleDrawerToggle}
-            >
-              <MenuIcon />
-            </IconButton>
-          </Hidden>
-          <Hidden smUp>
-            <Drawer
-                anchor="right"
-                open={drawerOpen}
-                onClose={handleDrawerToggle}
-            >
-                <List>
-                    <ListItem
-                        button
-                        onClick={() =>
-                            navigate("/profile/" + currentUser.reloadUserInfo.localId)
-                        }
-                    >
-                        <ListItemText primary="Back to profile" />
-                    </ListItem>
-                    <ListItem
-                        button
-                        disabled={!parkings}
-                        onClick={closestParkingSpot}
-                    >
-                        <ListItemText primary="Closest Parking Spot" />
-                    </ListItem>
-                    <ListItem button disabled={!parkings} onClick={zoomMyLocation}>
-                        <ListItemText primary="My location" />
-                    </ListItem>
-                </List>
-            </Drawer>
-          </Hidden>
-
-          <Hidden smDown>
+          <Hidden xsDown>
             <Grid
               container
               sx={{
@@ -193,7 +147,7 @@ const Map = () => {
                 alignItems: "center",
               }}
             >
-              <Grid item xs={12} sm={4} md={3} lg={3}>
+              <Grid item xs={4} sm={4} md={3} lg={3}>
                 <Fab
                   variant="extended"
                   onClick={() =>
@@ -213,7 +167,7 @@ const Map = () => {
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={12} sm={5} md={4} lg={4}>
+              <Grid item xs={4} sm={5} md={4} lg={4}>
                 <Fab
                   variant="extended"
                   disabled={!parkings}
@@ -232,7 +186,7 @@ const Map = () => {
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={12} sm={3} md={3} lg={3}>
+              <Grid item xs={4} sm={3} md={3} lg={3}>
                 <Fab
                   variant="extended"
                   aria-label="map"
@@ -359,7 +313,6 @@ const createMarkersParking = (
     const marker = L.marker([parking.GPSLattitude, parking.GPSLongitude], {
       icon: customIcon,
     }).addTo(mapRef.current);
-    
 
     // Add a click event to the marker
     marker.on("click", () => {
@@ -370,12 +323,18 @@ const createMarkersParking = (
           style={{ color: "#333", fontFamily: "Arial", fontWeight: "bold" }}
         >
           <Grid item>
-            <Typography variant="h3" style={{ color: "#3f51b5", textAlign: "center" }}>
+            <Typography
+              variant="h3"
+              style={{ color: "#3f51b5", textAlign: "center" }}
+            >
               Parking Status: {parking.Status}
             </Typography>
           </Grid>
           <Grid item>
-            <Typography variant="h4" style={{ color: "#3f51b5", textAlign: "center" }}>
+            <Typography
+              variant="h4"
+              style={{ color: "#3f51b5", textAlign: "center" }}
+            >
               Location:{parking.GPSLattitude}, {parking.GPSLongitude}
             </Typography>
           </Grid>
