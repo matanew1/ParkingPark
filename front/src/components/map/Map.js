@@ -52,9 +52,14 @@ const Map = () => {
   const mapOptions = useMemo(
     () => ({
       center: location ? [location.latitude, location.longitude] : [0, 0],
-      zoom: 14,
+      zoom: 13,
+      minZoom: 10, // Minimum zoom level
+      maxZoom: 18, // Maximum zoom level
+      preload: Infinity, // Preload the tile images to improve the user experience
       zoomControl: false, // Disable the default zoom control
-      maxBounds: L.latLngBounds(L.latLng(29, 30), L.latLng(33.2764, 35.8967)), // Restrict the view to the given geographical bounds
+      zoomSnap: 0.2, // Snap to zoom level increments of 0.2
+      renderer: L.canvas(),
+      maxBounds: L.latLngBounds(L.latLng(29, 34), L.latLng(34, 37)), // Restrict the view to the given geographical bounds
     }),
     [location]
   );
@@ -273,6 +278,8 @@ const initializeMap = (mapRef, latitude, longitude, mapOptions) => {
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", // Use HTTPS instead of HTTP
     { attribution: "© OpenStreetMap", maxZoom: 18 }
   );
+
+  L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
 
   layer.addTo(mapRef.current);
 };
