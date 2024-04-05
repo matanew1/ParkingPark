@@ -11,22 +11,5 @@
             "src": "/routes/.*",
             "dest": "/index.js"
         }
-    ],
-    "env": {
-        "MONGO_URI": "@mongo_uri"
-    },
-    "functions": {
-        "api/*": {
-            "runtime": "nodejs12.x",
-            "memory": 512,
-            "includeFiles": "api/**",
-            "environment": {
-                "MONGO_URI": "@mongo_uri"
-            }
-        }
-    },
-    "output": {
-        "clean": true
-    },
-    "regions": ["sfo", "nyc"]
+    ]
 }
