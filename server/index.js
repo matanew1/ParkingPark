@@ -24,3 +24,5 @@ app.use("/api/parking", parkingRouter);
 
 // Start server
 app.listen(4000, () => console.log("The server is running at PORT 4000"));
+
+// Path: server/routes/user.js
