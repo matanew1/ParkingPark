@@ -20,7 +20,7 @@ const options = {
         },
         servers: [
             {
-                url: "http://localhost:4000" || "https://parking-park-server.vercel.app/",
+                url: "http://localhost:4000",
                 description: "Local server",
             },
             // add other servers if any

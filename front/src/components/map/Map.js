@@ -17,7 +17,13 @@ import {
   Toolbar,
   Fab,
   Paper,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import IconButton from "@mui/material/IconButton";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -47,6 +53,11 @@ const Map = () => {
   const [line, setLine] = useState(null);
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
+  };
   // useMemo is used to memoize the map options - this is useful when the map options are not changing
   const mapOptions = useMemo(
     () => ({
@@ -115,93 +126,134 @@ const Map = () => {
         Loading data from server... &nbsp;&nbsp;
         <CircularProgress color="inherit" />
       </Backdrop>
+
       <AppBar
-        position="absolute" // Position the app bar at the top
+        position="absolute"
         sx={{
           backdropFilter: "blur(4px)",
           backgroundColor: "transparent",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "none",
+          justifyContent: "end",
+          alignItems: "end",
           display: "flex",
+          boxShadow: "none",
         }}
       >
         <Toolbar
           sx={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
             boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.9)",
-            borderRadius: "10px", // Add rounded borders
+            borderRadius: "10px",
           }}
         >
-          <Grid
-            container
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Grid item xs={12} sm={6} md={4} lg={4}>
-              <Fab
-                variant="extended"
-                onClick={() =>
-                  navigate("/profile/" + currentUser.reloadUserInfo.localId)
-                }
-                style={{
-                  margin: "10px",
-                  backgroundColor: "transparent",
-                  color: "purple",
-                }}
-              >
-                <ArrowBackIcon />
-                <Hidden lgDown>
-                  <Typography variant="body1" style={{ marginLeft: "10px" }}>
-                    Back to profile
-                  </Typography>
-                </Hidden>
-              </Fab>
+          <Hidden smUp>
+            <IconButton
+              onClick={handleDrawerToggle}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Hidden>
+          <Hidden smUp>
+            <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={handleDrawerToggle}
+            >
+                <List>
+                    <ListItem
+                        button
+                        onClick={() =>
+                            navigate("/profile/" + currentUser.reloadUserInfo.localId)
+                        }
+                    >
+                        <ListItemText primary="Back to profile" />
+                    </ListItem>
+                    <ListItem
+                        button
+                        disabled={!parkings}
+                        onClick={closestParkingSpot}
+                    >
+                        <ListItemText primary="Closest Parking Spot" />
+                    </ListItem>
+                    <ListItem button disabled={!parkings} onClick={zoomMyLocation}>
+                        <ListItemText primary="My location" />
+                    </ListItem>
+                </List>
+            </Drawer>
+          </Hidden>
+
+          <Hidden smDown>
+            <Grid
+              container
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Grid item xs={12} sm={4} md={3} lg={3}>
+                <Fab
+                  variant="extended"
+                  onClick={() =>
+                    navigate("/profile/" + currentUser.reloadUserInfo.localId)
+                  }
+                  style={{
+                    margin: "10px",
+                    backgroundColor: "transparent",
+                    color: "purple",
+                  }}
+                >
+                  <ArrowBackIcon />
+                  <Hidden smDown>
+                    <Typography variant="body1" style={{ marginLeft: "10px" }}>
+                      Back to profile
+                    </Typography>
+                  </Hidden>
+                </Fab>
+              </Grid>
+              <Grid item xs={12} sm={5} md={4} lg={4}>
+                <Fab
+                  variant="extended"
+                  disabled={!parkings}
+                  onClick={closestParkingSpot}
+                  style={{
+                    margin: "10px",
+                    backgroundColor: "transparent",
+                    color: "purple",
+                  }}
+                >
+                  <NavigationIcon sx={{ mr: 1 }} />
+                  <Hidden smDown>
+                    <Typography variant="body1">
+                      Closest Parking Spot
+                    </Typography>
+                  </Hidden>
+                </Fab>
+              </Grid>
+              <Grid item xs={12} sm={3} md={3} lg={3}>
+                <Fab
+                  variant="extended"
+                  aria-label="map"
+                  disabled={!parkings}
+                  style={{
+                    margin: "10px",
+                    backgroundColor: "transparent",
+                    color: "purple",
+                  }}
+                  onClick={zoomMyLocation}
+                >
+                  <LocationSearchingIcon />
+                  <Hidden smDown>
+                    <Typography variant="body1" style={{ marginLeft: "10px" }}>
+                      My location
+                    </Typography>
+                  </Hidden>
+                </Fab>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6} md={6} lg={4}>
-              <Fab
-                variant="extended"
-                disabled={!parkings}
-                onClick={closestParkingSpot}
-                style={{
-                  margin: "10px",
-                  backgroundColor: "transparent",
-                  color: "purple",
-                }}
-              >
-                <NavigationIcon sx={{ mr: 1 }} />
-                <Hidden lgDown>
-                  <Typography variant="body1">Closest Parking Spot</Typography>
-                </Hidden>
-              </Fab>
-            </Grid>
-            <Grid item xs={12} sm={6} md={5} lg={4}>
-              <Fab
-                variant="extended"
-                aria-label="map"
-                disabled={!parkings}
-                style={{
-                  margin: "10px",
-                  backgroundColor: "transparent",
-                  color: "purple",
-                }}
-                onClick={zoomMyLocation}
-              >
-                <LocationSearchingIcon />
-                <Hidden lgDown>
-                  <Typography variant="body1" style={{ marginLeft: "10px" }}>
-                    My location
-                  </Typography>
-                </Hidden>
-              </Fab>
-            </Grid>
-          </Grid>
+          </Hidden>
         </Toolbar>
       </AppBar>
 
@@ -307,6 +359,7 @@ const createMarkersParking = (
     const marker = L.marker([parking.GPSLattitude, parking.GPSLongitude], {
       icon: customIcon,
     }).addTo(mapRef.current);
+    
 
     // Add a click event to the marker
     marker.on("click", () => {
@@ -317,12 +370,12 @@ const createMarkersParking = (
           style={{ color: "#333", fontFamily: "Arial", fontWeight: "bold" }}
         >
           <Grid item>
-            <Typography variant="h2" style={{ color: "#3f51b5" }}>
+            <Typography variant="h3" style={{ color: "#3f51b5", textAlign: "center" }}>
               Parking Status: {parking.Status}
             </Typography>
           </Grid>
           <Grid item>
-            <Typography variant="h3">
+            <Typography variant="h4" style={{ color: "#3f51b5", textAlign: "center" }}>
               Location:{parking.GPSLattitude}, {parking.GPSLongitude}
             </Typography>
           </Grid>
@@ -336,9 +389,8 @@ const createMarkersParking = (
             <Paper
               style={{
                 textAlign: "center",
-                padding: "5px",
-                margin: "0",
                 backgroundColor: "#f0f0f0",
+                padding: "3px",
                 borderRadius: "15px", // Add this line
               }}
             >
@@ -356,7 +408,6 @@ const createMarkersParking = (
               style={{
                 textAlign: "center",
                 padding: "5px",
-                margin: "0",
                 backgroundColor: "#f0f0f0",
                 borderRadius: "15px", // Add this line
               }}
@@ -365,9 +416,9 @@ const createMarkersParking = (
             </Paper>
           </Grid>
           <Grid item>
-            <Typography variant="body1">
+            <Typography variant="h4">
               <AccessTimeIcon />
-              &nbsp;&nbsp;&nbsp;Parking Time:
+              &nbsp;&nbsp;&nbsp;Parking Time Fee:
             </Typography>
           </Grid>
           <Grid item>
@@ -375,7 +426,6 @@ const createMarkersParking = (
               style={{
                 textAlign: "right",
                 padding: "5px",
-                margin: "0",
                 backgroundColor: "#f0f0f0",
                 borderRadius: "15px", // Add this line
                 direction: "rtl", // Add this line
@@ -385,16 +435,16 @@ const createMarkersParking = (
             </Paper>
           </Grid>
           <Grid item>
-            <Typography variant="body1">
+            <Typography variant="h4">
               <AttachMoneyIcon />
-              &nbsp;&nbsp;&nbsp;Parking Fee:
+              &nbsp;&nbsp;&nbsp;Additional information:
             </Typography>
           </Grid>
           <Grid item>
             <Paper
               style={{
                 textAlign: "right",
-                padding: "5px",
+                padding: "3px",
                 margin: "0",
                 backgroundColor: "#f0f0f0",
                 borderRadius: "15px", // Add this line
