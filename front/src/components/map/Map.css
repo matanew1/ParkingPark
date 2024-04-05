@@ -13,6 +13,30 @@
     filter: drop-shadow(0 0 2px green);
 }
 
+.leaflet-popup-content-wrapper {
+    background: rgba(222, 202, 222, 0.2) !important;
+    backdrop-filter: blur(7px) !important;
+}
+
+@keyframes jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.my-icon-closest svg {
+    fill: #009dff;
+    stroke: #ffffff;
+    stroke-width: 2px;
+    filter: drop-shadow(0 0 5px #000000);
+    transition: all 0.1s ease;
+}
+
+.my-icon-closest:hover svg {
+    fill: #9b59b6;
+    stroke: #8e44ad;
+    filter: drop-shadow(0 0 5px #9b59b6);
+}
+
 .my-icon-secondary svg {
     fill: orange;
     stroke: black;

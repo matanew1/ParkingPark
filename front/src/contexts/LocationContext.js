@@ -15,30 +15,35 @@ export function useLocation() {
 export function LocationProvider({ children }) {
     const [location, setLocation] = useState(null);
     const [error, setError] = useState(null);
-    const [parkings, setParkings] = useState([]);
+    const [parkings, setParkings] = useState(null);
+    const baseUrl = 'http://localhost:4000/api/parking';
+    const [loading, setLoading] = useState(true);
+    const [intervalTime, setIntervalTime] = useState(30000); // Set initial interval time to 30 seconds
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:4000/api/parking/stations`, {
+                const response = await axios.get(`${baseUrl}/stations`, {
                     headers: {'Content-Type': 'application/json'}
                 });
-                console.log(response.data);
                 setParkings(response.data);
+                setLoading(false); // Set loading to false when data is loaded
+                setIntervalTime(30000); // Reset interval time to 30 seconds after successful fetch
             } catch (error) {
+                setIntervalTime(6000); // Set interval time to 5 seconds if there is an error
                 setError(error);
             }
         };
 
-        // Call once immediately
-        fetchData();
+    // Call once immediately
+    fetchData();
 
-        // Then call every 30 seconds
-        const interval = setInterval(fetchData, 30000); // 30 seconds
+    // Then call every intervalTime milliseconds
+    const interval = setInterval(fetchData, intervalTime);
 
-        // Clear interval on component unmount
-        return () => clearInterval(interval);
-    }, []);
+    // Clear interval on component unmount
+    return () => clearInterval(interval);
+    }, [intervalTime]);
 
     useEffect(() => {
         let watchId;
@@ -48,7 +53,6 @@ export function LocationProvider({ children }) {
                 const { latitude, longitude } = position.coords;
                 setLocation({ latitude, longitude });
             }, (error) => {
-                console.log(error);
                 setError(error.message);
             }, {
                 enableHighAccuracy: true,
@@ -57,7 +61,6 @@ export function LocationProvider({ children }) {
             });
         } else {
             const errorMessage = "Geolocation is not supported by this browser.";
-            console.log(errorMessage);
             setError(errorMessage);
         }
 
@@ -68,12 +71,32 @@ export function LocationProvider({ children }) {
         };
     }, []); // Removed setLocation and setError from the dependency array
 
+
+    const buildQueryString = (params) => {
+        return Object.keys(params)
+            .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+            .join('&');
+    };
+
+    const findClosestParking = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/stations/closestStation?${buildQueryString(location)}`, {
+                headers: {'Content-Type': 'application/json'}
+            });
+            return response.data;
+        } catch (error) {
+            setError(error);
+        }
+    };
+
     const value = {
         location,
         error,
         setLocation,
         setError,
         parkings,
+        findClosestParking,
+        loading
     };
 
     return (

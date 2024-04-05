@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Button, Grid, TextField, InputAdornment,Box, Paper, Typography, Avatar } from "@mui/material";
+import {
+  Button,
+  Grid,
+  TextField,
+  InputAdornment,
+  Box,
+  Paper,
+  Typography,
+  Avatar,
+} from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import PersonIcon from '@mui/icons-material/Person';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { CircularProgress } from "@mui/material";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,10 +28,10 @@ const Login = () => {
 
   useEffect(() => {
     if (currentUser) {
-      console.log(currentUser);
-      navigate("/profile/"+currentUser.reloadUserInfo.localId);
+      setError("");
+      navigate("/profile/" + currentUser.reloadUserInfo.localId);
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, setError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +44,7 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-
-  }
+  };
 
   return (
     <Grid
@@ -46,14 +55,22 @@ const Login = () => {
       spacing={2}
       style={{ height: "100vh" }}
     >
-     <Paper elevation={3} style={{ padding: '20px', borderRadius: '15px', backgroundColor: 'rgba(255, 255, 255, 0.5)', backdropFilter: 'blur(10px)' }}>
+      <Paper
+        elevation={3}
+        style={{
+          padding: "20px",
+          borderRadius: "15px",
+          backgroundColor: "rgba(255, 255, 255, 0.5)",
+          backdropFilter: "blur(10px)",
+        }}
+      >
         <Typography variant="h4" align="center" gutterBottom>
           Login
         </Typography>
-        <Avatar style={{ margin: '0 auto', backgroundColor: '#3f51b5' }}>
+        <Avatar style={{ margin: "0 auto", backgroundColor: "#3f51b5" }}>
           <AccountCircleIcon />
         </Avatar>
-        <form onSubmit={handleSubmit} style={{ width: '300px' }}>
+        <form onSubmit={handleSubmit} style={{ width: "300px" }}>
           <Grid item xs={12}>
             <TextField
               label="Email"
@@ -98,13 +115,20 @@ const Login = () => {
               size="large"
               fullWidth
             >
-              Login
+              {loading ? <CircularProgress size={24} /> : "Login"}
             </Button>
           </Grid>
           <Box mt={2} textAlign="center">
             <Typography variant="body2">
-              Don't have an account? 
-              <Link to="/register" style={{ textDecoration: 'none', color: '#3f51b5', marginLeft: '5px' }}>
+              Don't have an account?
+              <Link
+                to="/register"
+                style={{
+                  textDecoration: "none",
+                  color: "#3f51b5",
+                  marginLeft: "5px",
+                }}
+              >
                 Register
               </Link>
             </Typography>

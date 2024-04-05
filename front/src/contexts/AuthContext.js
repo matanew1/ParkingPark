@@ -8,7 +8,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const register = async (email, password) => {
@@ -66,6 +66,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUserProfile,
+    setLoading, 
+    loading
   };
 
   return (
