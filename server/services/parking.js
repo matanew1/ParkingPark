@@ -1,6 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const Station = require('../models/station');
+const { status } = require('../utils/consts');
 
 class ParkingService {
     #axios; // private field
@@ -47,6 +48,25 @@ class ParkingService {
             } else {
                 throw response.error;
             }
+        } catch (error) {
+            console.error('Error', error.message);
+            throw error;
+        }
+    }
+
+    async getTheClosestStation(latitude, longitude) {
+        try {
+            if (!this.#stations.length) {
+                await this.getAllStations();
+            }
+            const closestStation = this.#stations.reduce((closest, station) => {
+                const distance = station.calculateDistance(latitude, longitude);
+                if (!closest || distance < closest.distance && station.Status !== status.CloseOrNotAvailable && station.Status !== status.Full) {
+                    closest = { distance, station };
+                }
+                return closest;
+            }, null);
+            return closestStation ? closestStation.station : null;
         } catch (error) {
             console.error('Error', error.message);
             throw error;
