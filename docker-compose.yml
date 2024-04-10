@@ -12,6 +12,10 @@ services:
       - 4000:4000
     depends_on:
       - mongodb
+  tests:
+    build: ./tests
+    depends_on:
+      - backend
   mongodb:
     image: mongo:latest
     volumes:
