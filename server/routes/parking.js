@@ -44,4 +44,38 @@ router.get("/stations", parkingController.getAllStations);
  */
 router.get("/stations/closestStation", parkingController.getTheClosestStation);
 
+/**
+ * @openapi
+ * /api/parking/stations/{id}:
+ *   get:
+ *      description: Use to request the station by id
+ *      parameters:
+ *       - name: id
+ *         in: path
+ *         description: id
+ *         required: true
+ *         schema:
+ *          type: string
+ *      responses:
+ *         '200':
+ *              description: A successful response
+ *         '404':
+ *              description: A not found response
+ */
+router.get("/stations/:id", parkingController.getStationById);
+
+/**
+ * @openapi
+ * /api/parking/stations/cheapestStation:
+ *   get:
+ *      description: Use to request the cheapest station
+ *   responses:
+ *      '200':
+ *          description: A successful response
+ *      '404':
+ *          description: A not found response
+ */
+
+router.get("/stations/cheapestStation", parkingController.getCheapestStation);
+
 module.exports = router;

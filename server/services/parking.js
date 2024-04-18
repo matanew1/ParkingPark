@@ -72,6 +72,32 @@ class ParkingService {
             throw error;
         }
     }
+
+    async getStationById(id) {
+        try {
+            if (!this.#stations.length) {
+                await this.getAllStations();
+            }
+            const station = this.#stations.find(station => station.Code === id);
+            return station;
+        } catch (error) {
+            console.error('Error', error.message);
+            throw error;
+        }
+    }
+
+    async getCheapestStation() {
+        try {
+            if (!this.#stations.length) {
+                await this.getAllStations();
+            }
+            // filter stations that are not full or closed
+            return null;
+        } catch (error) {
+            console.error('Error', error.message);
+            throw error;
+        }
+    }
 }
 
 module.exports = ParkingService;

@@ -36,6 +36,35 @@ class ParkingController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    getStationById = async (req, res) => {
+        try {
+            const id = req.params.id;
+            const station = await this.#parkingService.getStationById(id);
+            if (station) {
+                res.status(200).json(station);
+            } else {
+                res.status(404).json({ message: "Station not found" });
+            }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    getCheapestStation = async (req, res) => {
+        try {
+            const cheapestStation = await this.#parkingService.getCheapestStation();
+            if (cheapestStation) {
+                res.status(200).json(cheapestStation);
+            } else {
+                res.status(404).json({ message: "No stations found" });
+            }
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
+
+
 
 module.exports = ParkingController;
