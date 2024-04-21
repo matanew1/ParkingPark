@@ -81,7 +81,7 @@ typings/
 .nuxt
 
 # credentials file
-.server/firebase/credentials.json
+server/firebase/credentials.json
 
 # rollup.js default build output
 dist/
