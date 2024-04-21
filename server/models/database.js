@@ -1,5 +1,9 @@
-const mongoose = require("mongoose");
-require('dotenv').config();
+// database.js
+
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 class Database {
   #mongoose;
@@ -28,4 +32,4 @@ class Database {
 const db = new Database();
 db.connectToMongoDB();
 
-module.exports = db;
+export default db;

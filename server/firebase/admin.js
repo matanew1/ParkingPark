@@ -1,5 +1,6 @@
-const admin = require("firebase-admin");
-const serviceAccount = require("./credentials.json");
+// admin.js
+import admin from "firebase-admin";
+import serviceAccount from './credentials.json' assert { type: 'json' };
 
 class FirebaseAdmin {
   #adminInstance;
@@ -15,4 +16,4 @@ class FirebaseAdmin {
   }
 }
 
-module.exports = new FirebaseAdmin().getAdmin();
+export default new FirebaseAdmin().getAdmin();

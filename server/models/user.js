@@ -1,4 +1,6 @@
-const db = require("./database.js");
+// user.mjs
+
+import db from "./database.js";
 
 class UserModel {
   #User;
@@ -30,4 +32,4 @@ class UserModel {
   }
 }
 
-module.exports = new UserModel().getModel();
+export default new UserModel().getModel();

@@ -1,4 +1,5 @@
-const admin = require("./admin");
+// auth-middleware.js
+import admin from "./admin.js";
 
 class AuthMiddleware {
   #admin;
@@ -26,4 +27,4 @@ class AuthMiddleware {
   }
 }
 
-module.exports = new AuthMiddleware().verifyToken;
+export default new AuthMiddleware().verifyToken;

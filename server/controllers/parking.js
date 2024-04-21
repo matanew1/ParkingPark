@@ -1,4 +1,6 @@
-const ParkingService = require("../services/parking");
+// parking.js
+
+import ParkingService from "../services/parking.js";
 
 class ParkingController {
     #parkingService;
@@ -65,6 +67,4 @@ class ParkingController {
     }
 }
 
-
-
-module.exports = ParkingController;
+export default ParkingController;

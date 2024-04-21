@@ -1,8 +1,11 @@
-require("dotenv").config();
-const axios = require("axios");
-const Station = require("../models/station");
-const { status } = require("../utils/consts");
-const {pipeline} = require("../AIModel/model");
+// parking.js
+
+import dotenv from "dotenv";
+import axios from "axios";
+import Station from "../models/station.js";
+import { status } from "../utils/consts.js";
+
+dotenv.config();
 
 class ParkingService {
   #axios; // private field
@@ -133,4 +136,4 @@ class ParkingService {
   }
 }
 
-module.exports = ParkingService;
+export default ParkingService;

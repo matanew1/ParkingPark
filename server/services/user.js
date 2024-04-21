@@ -1,4 +1,5 @@
-const admin = require("../firebase/admin");
+// user.js
+import admin from "../firebase/admin.js";
 
 class UserService {
     #admin; // private field
@@ -18,4 +19,4 @@ class UserService {
     }
 }
 
-module.exports = UserService;
+export default UserService;

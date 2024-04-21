@@ -1,28 +1,19 @@
-// index.js
-const express = require("express");
+// index.mjs
+import express from "express";
 
 // model ai
-const {
+import {
   decisionMakerByText,
   translateText,
-  loadModel,
-  loadTranslator,
-  loadDecisionMaker,
-} = require("./AIModel/model");
-
-// Load the model and translator
-loadModel().then(() => {
-  loadTranslator();
-  loadDecisionMaker();
-});
+} from "./AIModel/model.js";
 
 // Import custom modules
-const verifyToken = require("./firebase/auth-middleware");
-const User = require("./models/user.js");
-const userRouter = require("./routes/user");
-const parkingRouter = require("./routes/parking");
-const setupSwagger = require("./middlewares/swagger");
-const setupMiddleware = require("./middlewares/middleware");
+import verifyToken from "./firebase/auth-middleware.js";
+import UserModel from "./models/user.js";
+import userRouter from "./routes/user.js";
+import parkingRouter from "./routes/parking.js";
+import setupSwagger from "./middlewares/swagger.js";
+import setupMiddleware from "./middlewares/middleware.js";
 
 // Initialize Express app
 const app = express();
@@ -38,11 +29,6 @@ app.use("/api/user", userRouter);
 app.use("/api/parking", parkingRouter);
 
 // AI model routes
-/**
- * {
-    "text": "תעריף לכניסה חד פעמית 24 ₪, תקף ל-24 שעות מרגע כניסת הרכב"
-}
- */
 app.post("/api/ai/translate", async (req, res) => {
   const text = req.body.text;
   const result = await translateText(text);
@@ -50,11 +36,6 @@ app.post("/api/ai/translate", async (req, res) => {
   res.send(result);
 });
 
-/**{
-    "text": "Prompt: Which parking option is preferable?
-    \n1. Entry fee: NIS 24, valid for 24 hours.
-    \n2. Entry fee: NIS 24, valid for 24 hours. Early exit within 15 minutes refunds fee."
-} */
 app.post("/api/ai/decisionMaker", async (req, res) => {
   const text = req.body.text;
   const result = await decisionMakerByText(text);
@@ -62,7 +43,12 @@ app.post("/api/ai/decisionMaker", async (req, res) => {
   res.send(result);
 });
 
-// Start server
-app.listen(4000, () => console.log("The server is running at PORT 4000"));
 
-// Path: server/routes/user.js
+// Start server
+const startServer = async () => {
+ app.listen(4000, () => {
+    console.log("The server is running at PORT 4000");
+  });
+};
+
+startServer();

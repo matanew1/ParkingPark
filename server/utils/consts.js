@@ -1,3 +1,5 @@
+// consts.js
+
 const status = Object.freeze({
     Full: 'אלמ',
     Available: 'יונפ',
@@ -5,6 +7,4 @@ const status = Object.freeze({
     CloseOrNotAvailable: 'רוגס',
 });
 
-module.exports = {
-    status,
-};
+export { status };

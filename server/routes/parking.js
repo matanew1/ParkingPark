@@ -1,5 +1,8 @@
-const express = require("express");
-const ParkingController = require("../controllers/parking.js");
+// parking.js
+
+import express from "express";
+import ParkingController from "../controllers/parking.js";
+
 const router = express.Router();
 const parkingController = new ParkingController();
 
@@ -78,4 +81,4 @@ router.get("/stations/:id", parkingController.getStationById);
 
 router.get("/stations/cheapestStation", parkingController.getCheapestStation);
 
-module.exports = router;
+export default router;

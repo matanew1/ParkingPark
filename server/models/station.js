@@ -1,3 +1,5 @@
+// station.js
+
 function toRadians(degrees) {
     return degrees * Math.PI / 180;
 }
@@ -12,7 +14,6 @@ function haversineFormula(lat1, lon1, lat2, lon2) {
 
     return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-
 
 class Station {
     constructor(Code, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments) {
@@ -38,4 +39,4 @@ class Station {
     }
 }
 
-module.exports = Station;
+export default Station;
