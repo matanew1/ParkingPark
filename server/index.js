@@ -2,7 +2,6 @@
 import express from "express";
 
 // Import custom modules
-import verifyToken from "./firebase/auth-middleware.js";
 import UserModel from "./models/user.js";
 import userRouter from "./routes/user.js";
 import parkingRouter from "./routes/parking.js";
