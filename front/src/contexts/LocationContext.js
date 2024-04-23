@@ -112,7 +112,6 @@ export function LocationProvider({ children }) {
       return response.data;
     } catch (error) {
       setError(error);
-      findCheapestParking();
     }
   };
 
