@@ -18,6 +18,7 @@ import {
   Fab,
   Paper,
 } from "@mui/material";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -46,7 +47,7 @@ const Map = () => {
     findClosestParking,
     findCheapestParking,
     loading,
-    setLoading
+    setLoading,
   } = useLocation();
   const { currentUser } = useAuth();
   const [closestParking, setClosestParking] = useState(null);
@@ -114,6 +115,19 @@ const Map = () => {
     setCheapestParking(res);
     const { GPSLattitude, GPSLongitude } = res;
     mapRef.current.setView([GPSLattitude, GPSLongitude], 14);
+  };
+
+  const resetAll = () => {
+    setClosestParking(null);
+    setCheapestParking(null);
+    if (lineClose) {
+      mapRef.current.removeLayer(lineClose);
+      setLineClose(null);
+    }
+    if (lineCheap) {
+      mapRef.current.removeLayer(lineCheap);
+      setLineCheap(null);
+    }
   };
 
   useIsomorphicLayoutEffect(() => {
@@ -198,7 +212,7 @@ const Map = () => {
                 alignItems: "center",
               }}
             >
-              <Grid item xs={3} sm={3} md={3} lg={2}>
+              <Grid item xs={2} sm={2} md={2.2} lg={2}>
                 <Fab
                   variant="extended"
                   onClick={() =>
@@ -211,14 +225,14 @@ const Map = () => {
                   }}
                 >
                   <ArrowBackIcon />
-                  <Hidden smDown>
+                  <Hidden mdDown>
                     <Typography variant="body1" style={{ marginLeft: "10px" }}>
                       Back to profile
                     </Typography>
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={3} sm={3} md={3} lg={3}>
+              <Grid item xs={2} sm={2} md={2.9} lg={3}>
                 <Fab
                   variant="extended"
                   onClick={cheapestParkingSpot}
@@ -229,14 +243,14 @@ const Map = () => {
                   }}
                 >
                   <AttachMoneyIcon />
-                  <Hidden smDown>
+                  <Hidden mdDown>
                     <Typography variant="body1" style={{ marginLeft: "10px" }}>
                       Cheapest Parking Spot
                     </Typography>
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={3} sm={3} md={3} lg={3}>
+              <Grid item xs={2.3} sm={2.5} md={2.9} lg={3}>
                 <Fab
                   variant="extended"
                   disabled={!parkings}
@@ -248,14 +262,14 @@ const Map = () => {
                   }}
                 >
                   <NavigationIcon sx={{ mr: 1 }} />
-                  <Hidden smDown>
+                  <Hidden mdDown>
                     <Typography variant="body1">
                       Closest Parking Spot
                     </Typography>
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={3} sm={3} md={2} lg={3}>
+              <Grid item xs={2.3} sm={2.5} md={2.3} lg={2}>
                 <Fab
                   variant="extended"
                   aria-label="map"
@@ -268,9 +282,26 @@ const Map = () => {
                   onClick={zoomMyLocation}
                 >
                   <LocationSearchingIcon />
-                  <Hidden smDown>
+                  <Hidden mdDown>
                     <Typography variant="body1" style={{ marginLeft: "10px" }}>
                       My location
+                    </Typography>
+                  </Hidden>
+                </Fab>
+              </Grid>
+              <Grid item xs={2.5} sm={2} md={1} lg={2}>
+                <Fab
+                  variant="extended"
+                  onClick={resetAll}
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "purple",
+                  }}
+                >
+                  <RestartAltIcon />
+                  <Hidden mdDown>
+                    <Typography variant="body1" style={{ marginLeft: "10px" }}>
+                      RESET
                     </Typography>
                   </Hidden>
                 </Fab>

@@ -92,6 +92,7 @@ class ParkingService {
 
   async getTheClosestStation(latitude, longitude) {
     try {
+      console.log(this.#stations.length);
       if (!this.#stations.length) {
         await this.getAllStations();
       }
