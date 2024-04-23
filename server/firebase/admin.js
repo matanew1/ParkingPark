@@ -1,5 +1,5 @@
 // admin.js
-import admin from "firebase-admin";
+import admin from "firebase-admin.js";
 import serviceAccount from './credentials.json' assert { type: 'json' };
 
 class FirebaseAdmin {
