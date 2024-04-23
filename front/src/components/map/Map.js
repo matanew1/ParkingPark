@@ -104,13 +104,10 @@ const Map = () => {
       return;
     }
     const res = await findCheapestParking();
-    setLoading(true);
     if (!res || !res.GPSLattitude || !res.GPSLongitude) {
       console.error("findCheapestParking did not return the expected result");
-      cheapestParkingSpot();
       return;
     }
-    setLoading(false);
     console.log(res);
     setCheapestParking(res);
     const { GPSLattitude, GPSLongitude } = res;

@@ -11,7 +11,7 @@ class TranslateService {
       url: 'https://google-translate113.p.rapidapi.com/api/v1/translator/text',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
-        'X-RapidAPI-Key': 'ba9db486c2mshfb41a38e3df0e0bp17b111jsn91f3d03974c7',
+        'X-RapidAPI-Key': '28c9d6ec66mshe67a087efc0ec59p1ebffcjsn2e918567d82b',
         'X-RapidAPI-Host': 'google-translate113.p.rapidapi.com'
       },
       data: this.#encodedParams,
