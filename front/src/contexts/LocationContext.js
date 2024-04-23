@@ -31,7 +31,12 @@ export function LocationProvider({ children }) {
         setLoading(false); // Set loading to false when data is loaded
         setIntervalTime(30000); // Reset interval time to 30 seconds after successful fetch
       } catch (error) {
-        setIntervalTime(6000); // Set interval time to 6 seconds if there is an error
+        console.log(error.response);
+        if (error.response && error.response.status === 429) {
+          setIntervalTime(30000); // Set interval time to 30 seconds if there are too many requests
+        } else {
+          setIntervalTime(6000); // Set interval time to 6 seconds if there is an error
+        }
         setError(error);
       }
     };

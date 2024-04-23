@@ -22,20 +22,23 @@ class ParkingService {
     this.#translateService = new TranslateService();
   }
 
+  async #makeRequest(endpoint) {
+    const response = await this.#axios.get(endpoint);
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.data;
+  }
+
   async #updateStationsStatus(stations) {
     try {
-      const response = await this.#axios.get("/StationsStatus");
-      if (response.status >= 200 && response.status < 300) {
-        const status = response.data;
-        stations.forEach((station) => {
-          const { InformationToShow } = status.find(
-            (s) => s.AhuzotCode === station.Code
-          );
-          station.updateStatus(InformationToShow);
-        });
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const status = await this.#makeRequest("/StationsStatus");
+      stations.forEach((station) => {
+        const { InformationToShow } = status.find(
+          (s) => s.AhuzotCode === station.Code
+        );
+        station.updateStatus(InformationToShow);
+      });
     } catch (error) {
       console.error("Error", error.message);
       throw error;
@@ -44,46 +47,42 @@ class ParkingService {
 
   async getAllStations() {
     try {
-      const response = await this.#axios.get("/stations");
-      if (response.status >= 200 && response.status < 300) {
-        this.#stations = response.data.reduce((stations, station) => {
-          const {
-            AhuzotCode,
-            Name,
-            Address,
-            GPSLattitude,
-            GPSLongitude,
-            DaytimeFee,
-            FeeComments,
-          } = station;
-          if (
-            AhuzotCode &&
-            Name &&
-            Address &&
-            GPSLattitude &&
-            GPSLongitude &&
-            DaytimeFee &&
-            FeeComments
-          ) {
-            stations.push(
-              new Station(
-                AhuzotCode,
-                Name,
-                Address,
-                GPSLattitude,
-                GPSLongitude,
-                DaytimeFee,
-                FeeComments
-              )
-            );
-          }
-          return stations;
-        }, []);
-        await this.#updateStationsStatus(this.#stations);
-        return this.#stations;
-      } else {
-        throw response.error;
-      }
+      const data = await this.#makeRequest("/stations");
+      this.#stations = data.reduce((stations, station) => {
+        const {
+          AhuzotCode,
+          Name,
+          Address,
+          GPSLattitude,
+          GPSLongitude,
+          DaytimeFee,
+          FeeComments,
+        } = station;
+        if (
+          AhuzotCode &&
+          Name &&
+          Address &&
+          GPSLattitude &&
+          GPSLongitude &&
+          DaytimeFee &&
+          FeeComments
+        ) {
+          stations.push(
+            new Station(
+              AhuzotCode,
+              Name,
+              Address,
+              GPSLattitude,
+              GPSLongitude,
+              DaytimeFee,
+              FeeComments
+            )
+          );
+        }
+        return stations;
+      }, []);
+      await this.#updateStationsStatus(this.#stations);
+      return this.#stations;
     } catch (error) {
       console.error("Error", error.message);
       throw error;
@@ -92,7 +91,6 @@ class ParkingService {
 
   async getTheClosestStation(latitude, longitude) {
     try {
-      console.log(this.#stations.length);
       if (!this.#stations.length) {
         await this.getAllStations();
       }
@@ -161,24 +159,22 @@ class ParkingService {
       const decisionString = closestStations.reduce((acc, station) => {
         return `${acc}Option ${station.Code}: Entry fee is ${station.DaytimeFee} and the distance from the current location is ${station.distance} meters.\n`;
       }, `Given the following parking options, which one is the most cost-effective and closest (the lower the distance in meters, the closer the location)?\n`);
-      console.log(decisionString);
-      // get the decision from the AI model
-      let decision = await decisionMakerByText(decisionString);
 
-      console.log(decision);
-
-      decision = Number(
-        decision[0]["generated_text"].match(/option (\d+)/i)[1]
-      );
-
-      if (!decision) {
-        throw new Error("Decision not found");
+      let decision = null;
+      while (!decision) {
+        const decisionResponse = await decisionMakerByText(decisionString);
+        const num = Number(
+          decisionResponse[0]["generated_text"].match(/option (\d+)/i)?.[1] ?? -1
+        );
+        if (num !== -1) {
+          decision = num;
+        }
       }
 
       closestStations = closestStations.filter(
         (station) => station.Code == decision
       );
-      return closestStations.length ? closestStations[0] : null;
+      return closestStations[0];
     } catch (error) {
       console.error("Error", error.message);
       throw error;

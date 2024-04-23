@@ -103,11 +103,13 @@ const Map = () => {
       mapRef.current.setView([GPSLattitude, GPSLongitude], 14);
       return;
     }
+    setLoading(true);
     const res = await findCheapestParking();
     if (!res || !res.GPSLattitude || !res.GPSLongitude) {
       console.error("findCheapestParking did not return the expected result");
       return;
     }
+    setLoading(false);
     console.log(res);
     setCheapestParking(res);
     const { GPSLattitude, GPSLongitude } = res;
@@ -125,6 +127,28 @@ const Map = () => {
       mapRef.current.removeLayer(lineCheap);
       setLineCheap(null);
     }
+
+    // clear cheapest parking and closest parking markers
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        if (
+          layer.options.icon.options.className === ICON_CLASSES.CHEAPEST ||
+          layer.options.icon.options.className === ICON_CLASSES.CLOSEST
+        ) {
+          mapRef.current.removeLayer(layer);
+        }
+      }
+    });
+
+    createMarkersParking(
+      handleLocationClick,
+      null,
+      null,
+      parkings,
+      mapRef
+    );
+
+    
   };
 
   useIsomorphicLayoutEffect(() => {
@@ -136,7 +160,7 @@ const Map = () => {
           initializeMap(mapRef, latitude, longitude, mapOptions);
         }
       }
-      updateMarker(markerRef, mapRef, latitude, longitude);
+      carMarker(markerRef, mapRef, latitude, longitude);
     }
     if (parkings && mapRef.current) {
       // Add null check here
@@ -167,7 +191,15 @@ const Map = () => {
         setLineCheap
       );
     }
-  }, [location, parkings, closestParking, lineCheap, lineClose, mapOptions]);
+  }, [
+    location,
+    parkings,
+    cheapestParking,
+    closestParking,
+    lineCheap,
+    lineClose,
+    mapOptions,
+  ]);
 
   return (
     <>
@@ -238,8 +270,14 @@ const Map = () => {
                     backgroundColor: "transparent",
                     color: "purple",
                   }}
+                  disabled={loading}
                 >
-                  <AttachMoneyIcon />
+                  {parkings && loading ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    <AttachMoneyIcon />
+                  )}
+
                   <Hidden mdDown>
                     <Typography variant="body1" style={{ marginLeft: "10px" }}>
                       Cheapest Parking Spot
@@ -522,7 +560,7 @@ const createMarkersParking = (
   });
 };
 
-const updateMarker = (markerRef, mapRef, latitude, longitude) => {
+const carMarker = (markerRef, mapRef, latitude, longitude) => {
   const iconSvgHtml = renderToString(
     <div className="flashing-icon">
       <DirectionsCarFilledIcon color="primary" />
