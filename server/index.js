@@ -8,7 +8,7 @@ import parkingRouter from "./routes/parking.js";
 import aiRouter from "./routes/ai.js";
 import translateRouter from "./routes/translate.js";
 import setupSwagger from "./middlewares/swagger.js";
-import setupMiddleware from "./middlewares.js";
+import setupMiddleware from "./middlewares/middleware.js";
 
 // Initialize Express app
 const app = express();
