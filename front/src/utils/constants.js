@@ -11,7 +11,8 @@ const ICON_CLASSES = {
     SECONDARY: 'my-icon-secondary',
     DISABLED: 'my-icon-disabled',
     CLOSED: 'my-icon-closed',
-    CLOSEST: 'my-icon-closest'
+    CLOSEST: 'my-icon-closest',
+    CHEAPEST: 'my-icon-cheapest',
 };
 
 export { PARKING_STATUS, ICON_CLASSES };

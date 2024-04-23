@@ -4,18 +4,22 @@ import dotenv from "dotenv";
 import axios from "axios";
 import Station from "../models/station.js";
 import { status } from "../utils/consts.js";
+import TranslateService from "./translate.js";
+import { decisionMakerByText } from "../AIModel/model.js";
 
 dotenv.config();
 
 class ParkingService {
   #axios; // private field
   #stations; // private field
+  #translateService;
 
   constructor() {
     this.#axios = axios.create({
       baseURL: process.env.BASE_URL,
     });
     this.#stations = [];
+    this.#translateService = new TranslateService();
   }
 
   async #updateStationsStatus(stations) {
@@ -110,25 +114,70 @@ class ParkingService {
     }
   }
 
-  async getStationById(id) {
+  async getCheapestStation(latitude, longitude) {
     try {
       if (!this.#stations.length) {
         await this.getAllStations();
       }
-      const station = this.#stations.find((station) => station.Code === id);
-      return station;
-    } catch (error) {
-      console.error("Error", error.message);
-      throw error;
-    }
-  }
+      // get top 5 closest stations
+      let closestStations = this.#stations
+        .map((station) => {
+          return {
+            ...station,
+            distance: station.calculateDistance(latitude, longitude),
+          };
+        })
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 5);
 
-  async getCheapestStation() {
-    try {
-      if (!this.#stations.length) {
-        await this.getAllStations();
+      // translate DaytimeFee to English
+      closestStations = await Promise.all(
+        closestStations.map(async (station) => {
+          let translatedDaytimeFee = await this.#translateService.translateText(
+            station.DaytimeFee,
+            "en"
+          );
+          // replace each ¼ with 1/4
+          translatedDaytimeFee = translatedDaytimeFee.replaceAll(
+            "¼",
+            "quarter of an hour"
+          );
+          // replace each NIS with New Israeli Shekel
+          translatedDaytimeFee = translatedDaytimeFee.replaceAll(
+            "NIS",
+            "New Israeli Shekel"
+          );
+          return { ...station, DaytimeFee: translatedDaytimeFee };
+        })
+      );
+
+      // the specific time of the day include hour and minutes in 24 hours format
+      const currentTimestamp = new Date().toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false,
+      });
+      const decisionString = closestStations.reduce((acc, station) => {
+        return `${acc}Option ${station.Code}: Entry fee is ${station.DaytimeFee} and the distance from the current location is ${station.distance} meters.\n`;
+      }, `Given the following parking options, which one is the most cost-effective and closest (the lower the distance in meters, the closer the location)?\n`);
+      console.log(decisionString);
+      // get the decision from the AI model
+      let decision = await decisionMakerByText(decisionString);
+
+      console.log(decision);
+
+      decision = Number(
+        decision[0]["generated_text"].match(/option (\d+)/i)[1]
+      );
+
+      if (!decision) {
+        throw new Error("Decision not found");
       }
-      return null;
+
+      closestStations = closestStations.filter(
+        (station) => station.Code == decision
+      );
+      return closestStations.length ? closestStations[0] : null;
     } catch (error) {
       console.error("Error", error.message);
       throw error;

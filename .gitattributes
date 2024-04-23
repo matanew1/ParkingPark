@@ -1,2 +1,0 @@
-mongodb/journal/WiredTigerLog.0000000032 filter=lfs diff=lfs merge=lfs -text
-mongodb/journal/WiredTigerPreplog.0000000001 filter=lfs diff=lfs merge=lfs -text

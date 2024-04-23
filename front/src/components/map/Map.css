@@ -31,6 +31,14 @@
     transition: all 0.1s ease;
 }
 
+.my-icon-cheapest svg {
+    fill: rgb(194, 25, 180);
+    stroke: #150210;
+    stroke-width: 2px;
+    filter: drop-shadow(0 0 5px #000000);
+    transition: all 0.1s ease;
+}
+
 .my-icon-closest:hover svg {
     fill: #9b59b6;
     stroke: #8e44ad;

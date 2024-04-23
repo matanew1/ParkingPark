@@ -16,7 +16,7 @@ import {
   AppBar,
   Toolbar,
   Fab,
-  Paper
+  Paper,
 } from "@mui/material";
 import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import LocationSearchingIcon from "@mui/icons-material/LocationSearching";
@@ -40,14 +40,23 @@ import CircularProgress from "@mui/material/CircularProgress";
 const Map = () => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
-  const { location, parkings, findClosestParking, loading } = useLocation();
+  const {
+    location,
+    parkings,
+    findClosestParking,
+    findCheapestParking,
+    loading,
+    setLoading
+  } = useLocation();
   const { currentUser } = useAuth();
   const [closestParking, setClosestParking] = useState(null);
+  const [cheapestParking, setCheapestParking] = useState(null);
   const navigate = useNavigate();
-  const [line, setLine] = useState(null);
+  const [lineClose, setLineClose] = useState(null);
+  const [lineCheap, setLineCheap] = useState(null);
   const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
-    
+
   // useMemo is used to memoize the map options - this is useful when the map options are not changing
   const mapOptions = useMemo(
     () => ({
@@ -87,6 +96,26 @@ const Map = () => {
     mapRef.current.setView([GPSLattitude, GPSLongitude], 14);
   };
 
+  const cheapestParkingSpot = async () => {
+    if (cheapestParking) {
+      const { GPSLattitude, GPSLongitude } = cheapestParking;
+      mapRef.current.setView([GPSLattitude, GPSLongitude], 14);
+      return;
+    }
+    const res = await findCheapestParking();
+    setLoading(true);
+    if (!res || !res.GPSLattitude || !res.GPSLongitude) {
+      console.error("findCheapestParking did not return the expected result");
+      cheapestParkingSpot();
+      return;
+    }
+    setLoading(false);
+    console.log(res);
+    setCheapestParking(res);
+    const { GPSLattitude, GPSLongitude } = res;
+    mapRef.current.setView([GPSLattitude, GPSLongitude], 14);
+  };
+
   useIsomorphicLayoutEffect(() => {
     if (location) {
       const { latitude, longitude } = location;
@@ -102,15 +131,32 @@ const Map = () => {
       // Add null check here
       createMarkersParking(
         handleLocationClick,
+        cheapestParking,
         closestParking,
         parkings,
         mapRef
       );
     }
     if (parkings && closestParking && location && mapRef.current) {
-      drawLineToClosestParking(location, closestParking, mapRef, line, setLine);
+      drawLineToParking(
+        location,
+        closestParking,
+        mapRef,
+        lineClose,
+        setLineClose
+      );
     }
-  }, [location, parkings, closestParking, line, mapOptions]);
+
+    if (parkings && cheapestParking && location && mapRef.current) {
+      drawLineToParking(
+        location,
+        cheapestParking,
+        mapRef,
+        lineCheap,
+        setLineCheap
+      );
+    }
+  }, [location, parkings, closestParking, lineCheap, lineClose, mapOptions]);
 
   return (
     <>
@@ -152,7 +198,7 @@ const Map = () => {
                 alignItems: "center",
               }}
             >
-              <Grid item xs={4} sm={4} md={3} lg={3}>
+              <Grid item xs={3} sm={3} md={3} lg={2}>
                 <Fab
                   variant="extended"
                   onClick={() =>
@@ -172,7 +218,25 @@ const Map = () => {
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={4} sm={5} md={4} lg={4}>
+              <Grid item xs={3} sm={3} md={3} lg={3}>
+                <Fab
+                  variant="extended"
+                  onClick={cheapestParkingSpot}
+                  style={{
+                    margin: "10px",
+                    backgroundColor: "transparent",
+                    color: "purple",
+                  }}
+                >
+                  <AttachMoneyIcon />
+                  <Hidden smDown>
+                    <Typography variant="body1" style={{ marginLeft: "10px" }}>
+                      Cheapest Parking Spot
+                    </Typography>
+                  </Hidden>
+                </Fab>
+              </Grid>
+              <Grid item xs={3} sm={3} md={3} lg={3}>
                 <Fab
                   variant="extended"
                   disabled={!parkings}
@@ -191,7 +255,7 @@ const Map = () => {
                   </Hidden>
                 </Fab>
               </Grid>
-              <Grid item xs={4} sm={3} md={3} lg={3}>
+              <Grid item xs={3} sm={3} md={2} lg={3}>
                 <Fab
                   variant="extended"
                   aria-label="map"
@@ -234,20 +298,20 @@ const Map = () => {
   );
 };
 
-const drawLineToClosestParking = (
+const drawLineToParking = (
   location,
-  closestParking,
+  cheapestParking,
   mapRef,
   line,
   setLine
 ) => {
   if (
     !location ||
-    !closestParking ||
+    !cheapestParking ||
     !location.latitude ||
     !location.longitude ||
-    !closestParking.GPSLattitude ||
-    !closestParking.GPSLongitude
+    !cheapestParking.GPSLattitude ||
+    !cheapestParking.GPSLongitude
   ) {
     return;
   }
@@ -255,7 +319,7 @@ const drawLineToClosestParking = (
   const latLngs = [
     [
       [location.latitude, location.longitude],
-      [closestParking.GPSLattitude, closestParking.GPSLongitude],
+      [cheapestParking.GPSLattitude, cheapestParking.GPSLongitude],
     ],
   ];
 
@@ -263,7 +327,7 @@ const drawLineToClosestParking = (
     line.setLatLngs(latLngs);
   } else {
     const newLine = L.polyline(latLngs, {
-      color: "red",
+      color: "green",
       dashArray: "10, 10",
     }).addTo(mapRef.current);
     newLine.snakeIn(); // animate the line
@@ -286,6 +350,7 @@ const initializeMap = (mapRef, latitude, longitude, mapOptions) => {
 
 const createMarkersParking = (
   handleLocationClick,
+  cheapestParking,
   closestParking,
   parkings,
   mapRef
@@ -295,6 +360,8 @@ const createMarkersParking = (
 
     if (closestParking && parking.Code === closestParking.Code) {
       iconClass = ICON_CLASSES.CLOSEST;
+    } else if (cheapestParking && parking.Code === cheapestParking.Code) {
+      iconClass = ICON_CLASSES.CHEAPEST;
     } else if (parking.Status === PARKING_STATUS.AVAILABLE) {
       iconClass = ICON_CLASSES.PRIMARY;
     } else if (parking.Status === PARKING_STATUS.FEW) {

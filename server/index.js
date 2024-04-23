@@ -1,17 +1,13 @@
 // index.mjs
 import express from "express";
 
-// model ai
-import {
-  decisionMakerByText,
-  translateText,
-} from "./AIModel/model.js";
-
 // Import custom modules
 import verifyToken from "./firebase/auth-middleware.js";
 import UserModel from "./models/user.js";
 import userRouter from "./routes/user.js";
 import parkingRouter from "./routes/parking.js";
+import aiRouter from "./routes/ai.js";
+import translateRouter from "./routes/translate.js";
 import setupSwagger from "./middlewares/swagger.js";
 import setupMiddleware from "./middlewares/middleware.js";
 
@@ -27,22 +23,8 @@ setupSwagger(app);
 // Route setup
 app.use("/api/user", userRouter);
 app.use("/api/parking", parkingRouter);
-
-// AI model routes
-app.post("/api/ai/translate", async (req, res) => {
-  const text = req.body.text;
-  const result = await translateText(text);
-  console.log(result);
-  res.send(result);
-});
-
-app.post("/api/ai/decisionMaker", async (req, res) => {
-  const text = req.body.text;
-  const result = await decisionMakerByText(text);
-  console.log(result); // Output the generated text
-  res.send(result);
-});
-
+app.use("/api/ai", aiRouter);
+app.use("/api/translate", translateRouter);
 
 // Start server
 const startServer = async () => {
