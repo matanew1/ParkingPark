@@ -3,7 +3,6 @@ import express from "express";
 
 // Import custom modules
 import UserModel from "./models/user.js";
-import userRouter from "./routes/user.js";
 import parkingRouter from "./routes/parking.js";
 import aiRouter from "./routes/ai.js";
 import translateRouter from "./routes/translate.js";
@@ -20,7 +19,6 @@ setupMiddleware(app);
 setupSwagger(app);
 
 // Route setup
-app.use("/api/user", userRouter);
 app.use("/api/parking", parkingRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/translate", translateRouter);
