@@ -39,7 +39,11 @@ loadModels().then(() => {
 const decisionMakerByText = async (text) => {
   try {
     if (!decisionMaker) {
-      throw new Error("Decision maker not loaded");
+      console.log("Decision maker not loaded. Loading now...");
+      await loadModels();
+      if (!decisionMaker) {
+        throw new Error("Failed to load decision maker");
+      }
     }
 
     const decision = await decisionMaker(text, {
