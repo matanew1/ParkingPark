@@ -16,8 +16,7 @@ export function LocationProvider({ children }) {
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
   const [parkings, setParkings] = useState(null);
-  const baseUrl = 'https://parking-park-server.vercel.app/api/parking';
-  // const baseUrl = "http://localhost:4000/api/parking";
+  const baseUrl = "http://localhost:4000/api/parking";
   const [loading, setLoading] = useState(true);
   const [intervalTime, setIntervalTime] = useState(30000); // Set initial interval time to 30 seconds
 

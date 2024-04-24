@@ -7,10 +7,11 @@ let decisionMaker;
 console.log("Loading models...");
 const loadModels = async () => {
   try {
-    const [decisionMakerModel] = await Promise.all([
-      pipeline("text2text-generation", "Xenova/LaMini-Flan-T5-783M"),
-    ]);
-    decisionMaker = decisionMakerModel;
+    const decisionMakerModel = await pipeline(
+        "text2text-generation",
+        "Xenova/LaMini-Flan-T5-783M"
+      ),
+      decisionMaker = decisionMakerModel;
   } catch (error) {
     console.error("Error loading models:", error);
   }
