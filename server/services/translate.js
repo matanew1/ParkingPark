@@ -1,32 +1,32 @@
-import axios from "axios";
+import axios from 'axios';
 
 class TranslateService {
-  #encodedParams;
   #options;
 
   constructor() {
-    this.#encodedParams = new URLSearchParams();
     this.#options = {
       method: 'POST',
-      url: 'https://google-translate113.p.rapidapi.com/api/v1/translator/text',
+      url: 'https://deep-translate1.p.rapidapi.com/language/translate/v2',
       headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'X-RapidAPI-Key': '28c9d6ec66mshe67a087efc0ec59p1ebffcjsn2e918567d82b',
-        'X-RapidAPI-Host': 'google-translate113.p.rapidapi.com'
+        'content-type': 'application/json',
+        'X-RapidAPI-Key': 'ba9db486c2mshfb41a38e3df0e0bp17b111jsn91f3d03974c7',
+        'X-RapidAPI-Host': 'deep-translate1.p.rapidapi.com'
       },
-      data: this.#encodedParams,
+      data: {},
     };
   }
 
   async translateText(text, to) {
-    this.#encodedParams.set("from", "he");
-    this.#encodedParams.set("to", to);
-    this.#encodedParams.set("text", text);
+    this.#options.data = {
+      source: "he",
+      target: "en",
+      q: text
+    };
     try {
       const response = await axios.request(this.#options);
-      return response.data.trans;
+      return response.data.data.translations.translatedText;
     } catch (error) {
-      console.error(error);
+      throw new Error(error);
     }
   }
 }

@@ -10,15 +10,12 @@ const loadModels = async () => {
     const decisionMakerModel = await pipeline(
         "text2text-generation",
         "Xenova/LaMini-Flan-T5-783M"
-      ),
-      decisionMaker = decisionMakerModel;
+      );
+    decisionMaker = decisionMakerModel;
   } catch (error) {
     console.error("Error loading models:", error);
   }
 };
-loadModels().then(() => {
-  console.log("---------------Models loaded----------------");
-});
 
 // Generate text based on the input text
 const decisionMakerByText = async (text) => {
@@ -42,5 +39,9 @@ const decisionMakerByText = async (text) => {
   }
 };
 
-// Export the functions for external use
-export { decisionMakerByText };
+// Export a function that initializes the model and returns the decisionMakerByText function
+export const initializeModel = async () => {
+  await loadModels();
+  console.log("---------------Models loaded----------------");
+  return { decisionMakerByText };
+};

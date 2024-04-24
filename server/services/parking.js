@@ -5,7 +5,14 @@ import axios from "axios";
 import Station from "../models/station.js";
 import { status } from "../utils/consts.js";
 import TranslateService from "./translate.js";
-import { decisionMakerByText } from "../AIModel/model.js";
+import { initializeModel } from "../AIModel/model.js";
+
+let decisionMakerByText;
+
+initializeModel().then((model) => {
+  decisionMakerByText = model.decisionMakerByText;
+  // Now you can use decisionMakerByText
+});
 
 dotenv.config();
 
