@@ -35,8 +35,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "leaflet.polyline.snakeanim/L.Polyline.SnakeAnim.js";
 import { PARKING_STATUS, ICON_CLASSES } from "../../utils/constants";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Backdrop, CircularProgress } from "@mui/material";
+
 
 const Map = () => {
   const mapRef = useRef(null);
