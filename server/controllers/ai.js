@@ -1,11 +1,4 @@
-import { initializeModel } from '../AIModel/model.js';
-
-let decisionMakerByText;
-
-initializeModel().then((model) => {
-  decisionMakerByText = model.decisionMakerByText;
-  // Now you can use decisionMakerByText
-});
+import { decisionMakerByText } from '../AIModel/model.js';
 
 
 class AIController  {
