@@ -18,7 +18,6 @@ export function LocationProvider({ children }) {
   const [parkings, setParkings] = useState(null);
   const baseUrl = "http://localhost:4000/api/parking";
   const [loading, setLoading] = useState(true);
-  const [intervalTime, setIntervalTime] = useState(30000); // Set initial interval time to 30 seconds
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,13 +27,13 @@ export function LocationProvider({ children }) {
         });
         setParkings(response.data);
         setLoading(false); // Set loading to false when data is loaded
-        setIntervalTime(30000); // Reset interval time to 30 seconds after successful fetch
+        setTimeout(fetchData, 30000); // Schedule next fetch in 30 seconds
       } catch (error) {
         console.log(error.response);
-        if (error.response && error.response.status === 429) {
-          setIntervalTime(30000); // Set interval time to 30 seconds if there are too many requests
+        if (error.response && error.response.status === 500) {
+          setTimeout(fetchData, 7000); // Schedule next fetch in 7 seconds if there is a server error
         } else {
-          setIntervalTime(6000); // Set interval time to 6 seconds if there is an error
+          setTimeout(fetchData, 6000); // Schedule next fetch in 6 seconds for other errors
         }
         setError(error);
       }
@@ -42,12 +41,7 @@ export function LocationProvider({ children }) {
 
     // Call once immediately
     fetchData();
-    // Then call every intervalTime milliseconds
-    const interval = setInterval(fetchData, intervalTime);
-
-    // Clear interval on component unmount
-    return () => clearInterval(interval);
-  }, [intervalTime]);
+  }, []); // Empty dependency array so this effect only runs once
 
   useEffect(() => {
     let watchId;
@@ -101,6 +95,7 @@ export function LocationProvider({ children }) {
 
   const findCheapestParking = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `${baseUrl}/stations/cheapestStation?${buildQueryString(location)}`,
         {
@@ -108,6 +103,7 @@ export function LocationProvider({ children }) {
         }
       );
       console.log(response);
+      setLoading(false);
       return response.data;
     } catch (error) {
       setError(error);

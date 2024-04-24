@@ -121,10 +121,11 @@ class ParkingService {
       // get top 5 closest stations
       let closestStations = this.#stations
         .map((station) => {
-          return {
-            ...station,
-            distance: station.calculateDistance(latitude, longitude),
-          };
+          if (station.Status !== status.CloseOrNotAvailable)
+            return {
+              ...station,
+              distance: station.calculateDistance(latitude, longitude),
+            };
         })
         .sort((a, b) => a.distance - b.distance)
         .slice(0, 5);
@@ -164,11 +165,13 @@ class ParkingService {
       while (!decision) {
         const decisionResponse = await decisionMakerByText(decisionString);
         const num = Number(
-          decisionResponse[0]["generated_text"].match(/option (\d+)/i)?.[1] ?? -1
+          decisionResponse[0]["generated_text"].match(/option (\d+)/i)?.[1] ??
+            -1
         );
         if (num !== -1) {
           decision = num;
         }
+        console.log(decision);
       }
 
       closestStations = closestStations.filter(
