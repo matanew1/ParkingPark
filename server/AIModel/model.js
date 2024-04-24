@@ -1,16 +1,6 @@
 // textGenerationService.mjs
 import fetch from "isomorphic-fetch";
 import { pipeline } from "@xenova/transformers";
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const fs = require('fs');
-const path = require('path');
-
-const cacheDir = path.join('/tmp', '@xenova', 'transformers', '.cache');
-
-if (!fs.existsSync(cacheDir)) {
-  fs.mkdirSync(cacheDir, { recursive: true });
-}
 
 let decisionMaker;
 
