@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 const fs = require('fs');
 const path = require('path');
 
-const cacheDir = path.join(process.cwd(), 'node_modules', '@xenova', 'transformers', '.cache');
+const cacheDir = path.join('/tmp', '@xenova', 'transformers', '.cache');
 
 if (!fs.existsSync(cacheDir)) {
   fs.mkdirSync(cacheDir, { recursive: true });
