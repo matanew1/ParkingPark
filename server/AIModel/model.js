@@ -2,6 +2,12 @@
 import fetch from "isomorphic-fetch";
 import { pipeline } from "@xenova/transformers";
 
+import fs from "fs";
+import path from "path";
+const cacheDir = path.join(__dirname, 'node_modules', '@xenova', 'transformers', '.cache');
+
+fs.mkdirSync(cacheDir, { recursive: true });
+
 let decisionMaker;
 
 console.log("Loading models...");
