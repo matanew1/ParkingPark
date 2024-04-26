@@ -17,7 +17,7 @@ export function LocationProvider({ children }) {
   const [error, setError] = useState(null);
   const [parkings, setParkings] = useState(null);
   // const baseUrl = "http://localhost:4000/api/parking";
-  const baseUrl = "https://parking-park-server.vercel.app/"
+  const baseUrl = "https://parking-park-server.vercel.app"
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
