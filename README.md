@@ -13,9 +13,8 @@
 ## Technologies
 
 - **Backend:** 
-  - **Spring Boot:** RESTful API development.
-  - **Hibernate:** ORM for database interaction.
-  - **Postgresql:** Database management.
+  - **Node.js:** RESTful API development.
+  - **MongoDB:** Database management.
 
 - **Frontend:**
   - **React.JS:** Dynamic and responsive user interface.
