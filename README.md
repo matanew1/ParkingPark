@@ -6,8 +6,6 @@
 
 - **Find the Closest Parking**: Users can quickly locate the nearest available parking spaces using real-time data, making it easier to find parking in busy areas.
 - **View All Parking Status**: Displays the status of all nearby parking spaces, showing which spots are available or occupied in real-time, helping users make informed decisions.
-- **Booking Management**: Users can reserve parking spaces in advance through a user-friendly interface, ensuring they have a spot when needed.
-- **Admin Dashboard**: Administrators can manage the parking facility, view comprehensive reports, monitor space usage, and control user access from a centralized dashboard.
 - **User Authentication**: Secure login system for both users and administrators, ensuring that only authorized individuals can access and manage the system.
 - **Responsive Design**: The system is designed to be accessible and functional on desktop and mobile devices, providing a seamless experience across different platforms.
 
