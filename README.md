@@ -1,6 +1,6 @@
 # ParkingPark
 
-**ParkingPark** is a smart parking management system designed to optimize parking space usage through real-time data and automation. The system offers intuitive interfaces for administrators and users, enabling efficient management of parking spaces, bookings, and overall facility control.
+ParkingPark helps users find available parking spots in Ahuzat HaHof, Tel Aviv, using real-time data. It shows the closest options and the status of all nearby spaces, with secure user authentication and a responsive design for both desktop and mobile devices.
 
 ## Features
 
