@@ -1,22 +1,49 @@
-version: '3'
+version: "3.8"
+
 services:
-  frontend:
-    build: ./front
-    ports:
-      - 3000:3000
-    depends_on:
-      - backend
-  backend:
-    build: ./server
-    ports:
-      - 4000:4000
-    depends_on:
-      - mongodb
-  tests:
-    build: ./tests
-    depends_on:
-      - backend
   mongodb:
     image: mongo:latest
+    container_name: parking-mongodb
+    restart: always
     ports:
-      - 27017:27017
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    networks:
+      - parking-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  parking-api:
+    build:
+      context: . # Make sure the Dockerfile is in the root of your project directory
+      dockerfile: server/Dockerfile
+    container_name: parking-api
+    restart: always
+    ports:
+      - "4000:4000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/parkingdb?authSource=admin
+      - BASE_URL=${BASE_URL}
+      - RAPID_API_KEY=${RAPID_API_KEY}
+      - RAPID_API_HOST=${RAPID_API_HOST}
+    networks:
+      - parking-network
+
+networks:
+  parking-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
