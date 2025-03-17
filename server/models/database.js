@@ -1,9 +1,22 @@
 // database.js
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+// Get the directory name in ES module
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-dotenv.config();
+// Load environment variables
+const envPath = path.resolve(__dirname, '../.env');
+if (fs.existsSync(envPath)) {
+  console.log(`Loading environment from ${envPath}`);
+  dotenv.config({ path: envPath });
+} else {
+  console.log('No .env file found, using environment variables');
+  dotenv.config();
+}
 
 class Database {
   #mongoose;
@@ -11,16 +24,29 @@ class Database {
 
   constructor() {
     this.#mongoose = mongoose;
-    this.#mongoose.set("strictPopulate", false);
-    this.#mongoURI = process.env.MONGO_URI;
+    this.#mongoose.set('strictQuery', false);
+
+    // Get MongoDB URI from environment or use default
+    this.#mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/parkingdb';
   }
 
   async connectToMongoDB() {
     try {
       await this.#mongoose.connect(this.#mongoURI);
-      console.log("Connected to MongoDB");
+      console.log('✅ Connected to MongoDB');
+
+      // Handle connection events
+      this.#mongoose.connection.on('error', (err) => {
+        console.error('❌ MongoDB connection error:', err);
+      });
+
+      this.#mongoose.connection.on('disconnected', () => {
+        console.warn('⚠️ MongoDB disconnected');
+      });
+
     } catch (error) {
-      console.error("Failed to connect to MongoDB", error);
+      console.error('❌ Failed to connect to MongoDB:', error);
+      // Don't exit - let the application handle the error
     }
   }
 
@@ -30,6 +56,5 @@ class Database {
 }
 
 const db = new Database();
-db.connectToMongoDB();
 
 export default db;

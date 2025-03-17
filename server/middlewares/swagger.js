@@ -1,38 +1,58 @@
 // swagger.js
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import pkg from '../package.json' assert { type: 'json' };
+import config from '../utils/configs.js';
 
 const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: "ParkingPark API",
-            version: "1.0.0", // version of the API
-            description: "ParkingPark API Information",
+            title: 'ParkingPark API',
+            version: pkg.version,
+            description: 'ParkingPark API Information',
             contact: {
-                name: "Developer",
-                email: "matanew1@bardugo.com", // your email
+                name: 'Developer',
+                email: 'matanew1@bardugo.com',
             },
             license: {
-                name: "MIT License",
-                url: "https://spdx.org/licenses/MIT.html",
+                name: 'MIT License',
+                url: 'https://spdx.org/licenses/MIT.html',
             },
         },
         servers: [
             {
-                url: "http://localhost:4000",
-                description: "Local server",
+                url: config.env === 'production'
+                    ? 'https://api.yourapp.com'
+                    : `http://localhost:${config.port}`,
+                description: config.env === 'production' ? 'Production server' : 'Local server',
             },
-            // add other servers if any
         ],
+        components: {
+            securitySchemes: {
+                ApiKeyAuth: {
+                    type: 'apiKey',
+                    in: 'header',
+                    name: 'X-API-KEY',
+                },
+            },
+        },
+        security: [{
+            ApiKeyAuth: [],
+        }],
     },
-    apis: ["./routes/*.js"], // files containing annotations as above
+    apis: ['./routes/*.js'],
 };
 
 const specs = swaggerJsDoc(options);
 
 const setupSwagger = (app) => {
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+    const swaggerOptions = {
+        explorer: true,
+        customCss: '.swagger-ui .topbar { display: none }',
+    };
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerOptions));
 };
 
 export default setupSwagger;

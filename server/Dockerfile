@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Set environment variables
-ENV MONGO_URI=mongodb+srv://matan:matan@cluster0.bgo3pus.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+ENV MONGO_URI=mongodb://mongo:27017/parking
 ENV BASE_URL=https://api.tel-aviv.gov.il/parking/
 
 # Expose the port on which your application listens

@@ -1,136 +1,206 @@
-import dotenv from "dotenv";
-import axios from "axios";
-import Station from "../models/station.js";
-import { status } from "../utils/consts.js";
-import TranslateService from "./translate.js";
-import { decisionMakerByText } from "../AIModel/model.js";
+// parking.js (service)
+import axios from 'axios';
+import Station from '../models/station.js';
+import { createLogger } from '../utils/logger.js';
+import TranslateService from './translate.js';
+import config from '../utils/configs.js';
+import NodeCache from 'node-cache';
+import HistoryOperationService from './history.js';
+import operation from '../models/operation.js';
 
-dotenv.config();
+const logger = createLogger('ParkingService');
 
 class ParkingService {
   #axios;
   #stations;
+  #historyOperationService;
   #translateService;
+  #cache;
 
   constructor() {
+    // Initialize axios with config
     this.#axios = axios.create({
-      baseURL: process.env.BASE_URL,
+      baseURL: config.apis.parking.baseUrl,
+      timeout: 10000,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
+
+    // Add response interceptor for error handling
+    this.#axios.interceptors.request.use(
+      config => {
+        logger.debug(`Request: ${config.method.toUpperCase()} ${config.baseURL}${config.url}`, {
+          headers: config.headers
+        });
+        return config;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+
     this.#stations = [];
     this.#translateService = new TranslateService();
+    this.#historyOperationService = new HistoryOperationService();
+
+    // Initialize cache with TTL of 10 minutes
+    this.#cache = new NodeCache({
+      stdTTL: 600,
+      checkperiod: 120,
+      useClones: false
+    });
   }
 
   async #makeRequest(endpoint) {
-    const response = await this.#axios.get(endpoint);
-    if (response.status < 200 || response.status >= 300) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const cacheKey = `api_${endpoint}`;
+
+    // Check if data is in cache
+    const cachedData = this.#cache.get(cacheKey);
+    if (cachedData) {
+      logger.debug(`Retrieved data from cache for ${endpoint}`);
+      return cachedData;
     }
-    return response.data;
+
+    // Make API request if not in cache
+    logger.debug(`Making API request to ${endpoint}`);
+    try {
+      const response = await this.#axios.get(endpoint);
+
+      // Validate response
+      if (!response.data) {
+        throw new Error('Empty response from API');
+      }
+
+      // Cache the result
+      this.#cache.set(cacheKey, response.data);
+
+      // save in history
+      console.log('response', response.statusText);
+      await this.#historyOperationService.addHistoryOperation({
+        endpoint: endpoint,
+        status: String(response.status),
+        message: String(response.statusText)
+      }).catch(error => {
+        logger.error('Error saving history operation', { error: error.message });
+      });
+
+      return response.data;
+    } catch (error) {
+      logger.error(`Error fetching data from ${endpoint}`, { error: error.message });
+      throw new Error(`Failed to fetch data: ${error.message}`);
+    }
   }
 
   async getAllStations() {
     try {
-      const data = await this.#makeRequest("/stations");
+      // Use cached stations if available
+      if (this.#stations.length > 0 && this.#cache.get('stations_data')) {
+        logger.debug('Returning cached stations data');
+        return this.#stations;
+      }
+
+      logger.info('Fetching all stations data from API');
+      const data = await this.#makeRequest('/stations');
+
+      // Process station data
       this.#stations = data
-        .map(station => this.#extractStationData(station))
-        .filter(stationData => stationData !== null)
-        .map(stationData => new Station(...stationData));
+        .map(station => Station.fromApiData(station))
+        .filter(Boolean); // Remove null entries
+
+      // Update status for all stations
       await this.#updateStationsStatus();
+
+      // Cache the processed stations
+      this.#cache.set('stations_data', this.#stations, 600); // 10 minutes TTL
+
       return this.#stations;
     } catch (error) {
-      console.error("Error", error.message);
+      logger.error('Error in getAllStations', { error: error.message });
       throw error;
     }
   }
 
   async #updateStationsStatus() {
     try {
-      const statusData = await this.#makeRequest("/StationsStatus");
-      this.#stations.forEach(station => {
-        const { InformationToShow } = statusData.find(s => s.AhuzotCode === station.Code) || {};
-        if (InformationToShow) station.updateStatus(InformationToShow);
-      });
+      logger.debug('Updating station statuses');
+      const statusData = await this.#makeRequest('/StationsStatus');
+
+      // Map of station codes to their status
+      const statusMap = new Map(
+        statusData.map(item => [item.AhuzotCode, item.InformationToShow])
+      );
+
+      // Update status for each station
+      for (const station of this.#stations) {
+        const status = statusMap.get(station.code);
+        if (status) {
+          station.updateStatus(status);
+        }
+      }
+
+      logger.debug('Station statuses updated successfully');
     } catch (error) {
-      console.error("Error updating station status", error.message);
-      throw error;
+      logger.error('Error updating station statuses', { error: error.message });
+      throw new Error(`Failed to update station statuses: ${error.message}`);
     }
   }
 
   async getTheClosestStation(latitude, longitude) {
     try {
-      if (!this.#stations.length) {
+      if (!latitude || !longitude) {
+        throw new Error('Latitude and longitude are required');
+      }
+
+      // Parse coordinates
+      const lat = parseFloat(latitude);
+      const lng = parseFloat(longitude);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        throw new Error('Invalid latitude or longitude');
+      }
+
+      logger.debug(`Finding closest station to (${lat}, ${lng})`);
+
+      // Ensure stations are loaded
+      if (this.#stations.length === 0) {
         await this.getAllStations();
       }
-      const closestStation = this.#stations.reduce((closest, station) => {
-        const distance = station.calculateDistance(latitude, longitude);
-        if (
-          !closest ||
-          (distance < closest.distance &&
-            station.Status !== status.CloseOrNotAvailable &&
-            station.Status !== status.Full)
-        ) {
-          closest = { distance, station };
-        }
-        return closest;
-      }, null);
-      return closestStation ? closestStation.station : null;
-    } catch (error) {
-      console.error("Error", error.message);
-      throw error;
-    }
-  }
 
-  async getCheapestStation(latitude, longitude) {
-    try {
-      if (!this.#stations.length) {
-        await this.getAllStations();
-      }
-  
-      const openStations = this.#stations.filter(station => station.Status !== status.CloseOrNotAvailable);
-      const stationsWithDistance = await Promise.all(openStations.map(async station => ({
-        ...station,
-        distance: await station.calculateDistance(latitude, longitude)
-      })));
-  
-      const closestStations = stationsWithDistance
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 5);
-  
-      const translationCache = {};
-  
-      // Translate the daytime fee for each station and display the options to the user for decision making 
-      await Promise.allSettled(closestStations.map(async station => {
-        if (!translationCache[station.DaytimeFee]) {
-          let translatedDaytimeFee = await this.#translateService.translateText(station.DaytimeFee, "en");
-          translatedDaytimeFee = translatedDaytimeFee.replaceAll("¼", "quarter of an hour").replaceAll("NIS", "New Israeli Shekel");
-          translationCache[station.DaytimeFee] = translatedDaytimeFee;
-        }
-        station.DaytimeFee = translationCache[station.DaytimeFee];
-      }));
-  
-      const decisionString = closestStations.reduce((acc, station) => `${acc}Option ${station.Code}: Entry fee is ${station.DaytimeFee} and the distance from the current location is ${station.distance} meters.\n`, `Given the following parking options, which one is the most cost-effective and closest (the lower the distance in meters, the closer the location)?\n`);
-  
-      let decision = null;
-      while (!decision) {
-        const decisionResponse = await decisionMakerByText(decisionString);
-        const num = Number(decisionResponse[0]?.generated_text.match(/option (\d+)/i)?.[1] ?? -1);
-        if (num !== -1) {
-          decision = num;
+      // Find closest available station
+      let closestStation = null;
+      let minDistance = Infinity;
+
+      for (const station of this.#stations) {
+        if (!station.isAvailable()) continue;
+
+        const distance = station.calculateDistance(lat, lng);
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestStation = station;
         }
       }
-  
-      return closestStations.find(station => station.Code == decision);
+
+      if (!closestStation) {
+        logger.warn('No available stations found');
+        return null;
+      }
+
+      logger.debug(`Found closest station: ${closestStation.name} at ${minDistance.toFixed(2)}m`);
+
+      // Add distance to the result
+      const result = closestStation.toJSON();
+      result.distance = {
+        meters: minDistance,
+        kilometers: minDistance / 1000
+      };
+
+      return result;
     } catch (error) {
-      console.error("Error", error.message);
+      logger.error('Error finding closest station', { error: error.message });
       throw error;
     }
-  }
-
-  #extractStationData(station) {
-    const { AhuzotCode, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments } = station;
-    return AhuzotCode && Name && Address && GPSLattitude && GPSLongitude && DaytimeFee && FeeComments
-      ? [AhuzotCode, Name, Address, GPSLattitude, GPSLongitude, DaytimeFee, FeeComments]
-      : null;
   }
 }
 
